@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard - Findero</title>
+<link rel="stylesheet" href="assets/styles.css">
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script defer src="assets/scripts.js"></script>
+</head>
+<body>
+<header>
+<img src="assets/logo.png" alt="Findero Logo" class="logo">
+<nav>
+<a href="lost.html" class="btn">Report Lost</a>
+<a href="found.html" class="btn">Report Found</a>
+<a href="#" id="logoutBtn" class="btn btn-orange">Logout</a>
+</nav>
+</header>
+
+<main>
+<h2>All Items</h2>
+<div id="itemsContainer" class="items-container">
+<!-- Lost & Found items will appear here -->
+</div>
+</main>
+</body>
+</html>
