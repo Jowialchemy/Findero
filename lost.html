@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Report Lost Item - Findero</title>
+<link rel="stylesheet" href="assets/styles.css">
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script defer src="assets/scripts.js"></script>
+</head>
+<body>
+<div class="form-container">
+<h2>Report Lost Item</h2>
+<form id="lostForm">
+<input type="text" id="itemName" placeholder="Item Name" required>
+<input type="text" id="itemDesc" placeholder="Description" required>
+<input type="text" id="location" placeholder="Location" required>
+<button type="submit" class="btn btn-orange">Submit</button>
+</form>
+</div>
+</body>
+</html>
