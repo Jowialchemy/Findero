@@ -40,6 +40,8 @@ footer { text-align:center; padding:1rem; background:var(--black); color:var(--w
 }
 
 .logo {
-    width: 160px;
+    width: 120px;
     height: auto;
-                        }
+    display: block;
+    margin: 10px auto;
+}
