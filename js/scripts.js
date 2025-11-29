@@ -74,3 +74,4 @@ function saveLostItem(data) {
 // -------------------------------
 function getLostItems() {
   return db.collection("lost_items").get();
+}
