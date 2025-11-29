@@ -1,0 +1,12 @@
+.site-header {
+    width: 100%;
+    padding: 15px 0;
+    background: #ffffff;
+    text-align: center;
+    border-bottom: 2px solid #0A5FFF;
+}
+
+.logo {
+    width: 160px;
+    height: auto;
+}
