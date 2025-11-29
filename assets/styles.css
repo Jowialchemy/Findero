@@ -28,8 +28,10 @@ header {
   background: var(--blue);
 }
 
-header .logo {
-  height: 50px;
+.logo {
+    height: 85px;     /* Larger logo */
+    width: auto;
+    object-fit: contain;
 }
 
 nav a {
