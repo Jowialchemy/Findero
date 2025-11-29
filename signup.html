@@ -26,12 +26,16 @@
     </form>
 
     <script>
+        // Prevent logged-in users from opening signup
         blockLoggedInUser();
 
         document.getElementById("signupForm").addEventListener("submit", e => {
             e.preventDefault();
 
-            createAccount(email.value, password.value)
+            const emailValue = document.getElementById("email").value;
+            const passwordValue = document.getElementById("password").value;
+
+            createAccount(emailValue, passwordValue)
                 .then(() => {
                     alert("Account created!");
                     window.location.href = "login.html";
