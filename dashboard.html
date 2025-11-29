@@ -3,35 +3,175 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard - Findero</title>
-<link rel="stylesheet" href="assets/styles.css">
+<title>Dashboard – Findero</title>
+
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js"></script>
-<script defer src="assets/scripts.js"></script>
+
+<style>
+/* GENERAL PAGE STYLE */
+body {
+    font-family: Arial, sans-serif;
+    background: #ffffff;
+    margin: 0;
+    padding: 0;
+    color: #0D0D0D;
+}
+
+/* HEADER – light gray like login/signup */
+header {
+    background-color: #e0e0e0;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.logo {
+    height: 95px;
+    width: auto;
+    object-fit: contain;
+}
+
+.logout-btn {
+    background: #FF8A00;
+    color: #fff;
+    padding: 10px 18px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.3s;
+}
+.logout-btn:hover {
+    background: #FFA233;
+}
+
+/* WELCOME SECTION */
+.welcome-box {
+    text-align: center;
+    padding: 30px 15px;
+}
+.welcome-box h2 {
+    color: #0A5FFF;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+/* DASHBOARD CARDS */
+.dashboard-grid {
+    max-width: 900px;
+    margin: 30px auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 20px;
+    padding: 0 15px;
+}
+
+.card {
+    background: #ffffff;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 6px 18px rgba(10,95,255,0.15);
+    text-align: center;
+    transition: 0.3s;
+    border-top: 4px solid #FF8A00;
+}
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 25px rgba(10,95,255,0.25);
+}
+
+.card h3 {
+    color: #0A5FFF;
+    margin-bottom: 10px;
+    font-size: 20px;
+}
+
+.card p {
+    font-size: 14px;
+    margin-bottom: 15px;
+}
+
+.action-btn {
+    background-color: #FF8A00;
+    color: #fff;
+    padding: 10px 14px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: bold;
+    display: inline-block;
+    transition: 0.3s;
+}
+.action-btn:hover {
+    background-color: #FFA233;
+}
+
+/* MOBILE */
+@media (max-width: 600px) {
+    .logo {
+        height: 70px;
+    }
+}
+</style>
 </head>
+
 <body>
-  
+
 <header>
-    <img src="assets/logo.png" alt="Findero Logo" class="logo">
-</header>
-    
-<nav>
-<a href="lost.html" class="btn">Report Lost</a>
-<a href="found.html" class="btn">Report Found</a>
-<a href="#" id="logoutBtn" class="btn btn-orange">Logout</a>
-</nav>
-    
-<header>
-    <img src="assets/logo.png" alt="Findero Logo" class="logo">
+    <img src="assets/logo.png" class="logo" alt="Findero logo">
+    <button class="logout-btn" id="logoutBtn">Logout</button>
 </header>
 
-<main>
-<h2>All Items</h2>
-<div id="itemsContainer" class="items-container">
-<!-- Lost & Found items will appear here -->
+<div class="welcome-box">
+    <h2>Welcome, <span id="userName">User</span> 👋</h2>
+    <p>Your Findero dashboard helps you track, search and manage lost items easily.</p>
 </div>
-</main>
+
+<div class="dashboard-grid">
+
+    <div class="card">
+        <h3>Search Items</h3>
+        <p>Browse all Lost & Found reports.</p>
+        <a href="search.html" class="action-btn">Search</a>
+    </div>
+
+    <div class="card">
+        <h3>Submit Item</h3>
+        <p>Report a lost or found item.</p>
+        <a href="submit.html" class="action-btn">Submit</a>
+    </div>
+
+    <div class="card">
+        <h3>Messages</h3>
+        <p>See conversations with finders.</p>
+        <a href="messages.html" class="action-btn">Open</a>
+    </div>
+
+    <div class="card">
+        <h3>Your Profile</h3>
+        <p>Manage your information.</p>
+        <a href="profile.html" class="action-btn">View Profile</a>
+    </div>
+
+</div>
+
+<script>
+/* FIREBASE AUTH CHECK */
+firebase.auth().onAuthStateChanged(user => {
+    if (!user) {
+        window.location.href = "login.html";
+        return;
+    }
+    document.getElementById("userName").textContent = user.displayName || "User";
+});
+
+/* LOGOUT */
+document.getElementById("logoutBtn").addEventListener("click", () => {
+    firebase.auth().signOut();
+});
+</script>
+
 </body>
 </html>
