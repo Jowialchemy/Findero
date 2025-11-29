@@ -11,7 +11,7 @@
 <script defer src="assets/scripts.js"></script>
 
 <style>
-/* MATCH Login design */
+/* MATCH Login design exactly */
 body {
     font-family: Arial, sans-serif;
     background: #ffffff;
@@ -19,7 +19,7 @@ body {
     padding: 0;
 }
 
-/* Header – LIGHT GRAY (#e0e0e0) */
+/* Header – same light gray (#e0e0e0) */
 header {
     background-color: #e0e0e0;
     padding: 20px;
@@ -32,7 +32,7 @@ header {
     object-fit: contain;
 }
 
-/* Form Box */
+/* Form styling */
 .form-container {
     max-width: 350px;
     margin: 40px auto;
@@ -93,7 +93,7 @@ input {
 </header>
 
 <div class="form-container">
-    <h2>Sign Up</h2>
+    <h2>Create Account</h2>
 
     <form id="signupForm">
         <input type="text" id="name" placeholder="Full Name" required>
@@ -123,7 +123,7 @@ document.getElementById('signupForm').addEventListener('submit', function(e) {
             const user = userCredential.user;
 
             user.updateProfile({ displayName: name }).then(() => {
-                alert('Signup successful! Redirecting to dashboard...');
+                alert('Signup successful! Redirecting...');
                 window.location.href = "dashboard.html";
             });
         })
