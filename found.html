@@ -3,83 +3,147 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Found Items - Findero</title>
+  <title>Findero - Submit Found Item</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 
   <style>
-    body { margin: 0; padding: 0; font-family: "Inter", sans-serif; background: #f5f7fa; }
+    body { margin:0; font-family:"Inter",sans-serif; background:#f5f7fa; }
+    header { background:#dcdcdc; padding:18px 30px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 4px 12px rgba(0,0,0,0.1);}
+    header img { height:95px; animation:fadeDown 0.5s ease; }
+    @keyframes fadeDown { from {opacity:0; transform:translateY(-10px);} to {opacity:1; transform:translateY(0);} }
 
-    header {
-      background: #dcdcdc;
-      padding: 16px 28px;
-      display: flex; justify-content: space-between; align-items: center;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-    }
-
-    header img { height: 95px; }
-
-    .btn-logout {
-      background: #ff7a00; color: white; padding: 10px 20px;
-      border-radius: 10px; border: none; cursor: pointer; font-weight: 600;
-    }
-
-    .container {
-      max-width: 900px; margin: 40px auto; padding: 20px;
-    }
-
-    .title { text-align: center; font-size: 30px; font-weight: 700; color: #1d4ed8; }
-    .subtitle { text-align: center; margin-bottom: 30px; color: #444; }
-
-    .card {
-      background: white; padding: 25px;
-      border-radius: 14px; box-shadow: 0 6px 14px rgba(0,0,0,0.1);
-    }
-
-    label { font-weight: 600; display: block; margin-top: 12px; }
-    input, textarea { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #ccc; background: #f9f9f9; }
-
-    textarea { height: 120px; resize: none; }
-
-    .btn-submit {
-      width: 100%; padding: 14px; margin-top: 20px;
-      background: #ff7a00; color: white; border-radius: 12px;
-      font-size: 17px; font-weight: 700; border: none; cursor: pointer;
-    }
-
+    .container { max-width:900px; margin:40px auto; padding:20px; }
+    .title { text-align:center; font-size:30px; font-weight:700; color:#1d4ed8; margin-bottom:15px; }
+    .subtitle { text-align:center; font-size:16px; color:#444; margin-bottom:30px; }
+    .card { background:white; padding:25px; border-radius:14px; box-shadow:0 6px 14px rgba(0,0,0,0.1); margin-bottom:30px; }
+    label { font-size:15px; font-weight:600; color:#333; display:block; margin-top:12px; }
+    input, textarea { width:100%; padding:12px; margin-top:6px; border:1px solid #ccc; border-radius:10px; font-size:15px; background:#f9f9f9; }
+    textarea { height:120px; resize:none; }
+    .btn-submit { width:100%; margin-top:20px; padding:14px; background:#ff7a00; color:white; border-radius:12px; font-size:17px; font-weight:700; cursor:pointer; border:none; transition:0.3s ease; }
+    .btn-submit:hover { transform:scale(1.05); background:#e06d00; }
+    .error { color:red; margin-top:10px; text-align:center; }
+    .success { color:green; margin-top:10px; text-align:center; }
+    footer { background:#1d4ed8; color:white; text-align:center; padding:20px; position:fixed; bottom:0; width:100%; }
   </style>
-</head>
 
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDL_BRheLzGxDJ-6XbjitZw8HFmUzQwgaI",
+      authDomain: "findero-39098.firebaseapp.com",
+      projectId: "findero-39098",
+      storageBucket: "findero-39098.appspot.com",
+      messagingSenderId: "796711693094",
+      appId: "1:796711693094:web:616efe1fd7291759d02fe7"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    const storage = firebase.storage();
+
+    // Redirect if not logged in
+    auth.onAuthStateChanged((user) => {
+      if (!user) window.location.href = "login.html";
+    });
+
+    function submitItem() {
+      const itemName = document.getElementById("itemName").value;
+      const locationFound = document.getElementById("locationFound").value;
+      const dateFound = document.getElementById("dateFound").value;
+      const description = document.getElementById("description").value;
+      const imageFile = document.getElementById("imageUpload").files[0];
+
+      const errorMsg = document.getElementById("errorMsg");
+      const successMsg = document.getElementById("successMsg");
+      errorMsg.innerText = "";
+      successMsg.innerText = "";
+
+      if (!itemName || !locationFound || !dateFound) {
+        errorMsg.innerText = "Please fill in all required fields.";
+        return;
+      }
+
+      // Create a unique ID for the item
+      const itemId = db.collection("foundItems").doc().id;
+
+      // Function to save item after optional image upload
+      const saveItem = (imageUrl = "") => {
+        db.collection("foundItems").doc(itemId).set({
+          itemId,
+          itemName,
+          locationFound,
+          dateFound,
+          description,
+          imageUrl,
+          submittedBy: auth.currentUser.uid,
+          timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        })
+        .then(() => {
+          successMsg.innerText = "Item submitted successfully!";
+          document.getElementById("itemName").value = "";
+          document.getElementById("locationFound").value = "";
+          document.getElementById("dateFound").value = "";
+          document.getElementById("description").value = "";
+          document.getElementById("imageUpload").value = "";
+        })
+        .catch((error) => { errorMsg.innerText = error.message; });
+      };
+
+      if (imageFile) {
+        const storageRef = storage.ref(`foundImages/${itemId}_${imageFile.name}`);
+        storageRef.put(imageFile)
+          .then(() => storageRef.getDownloadURL())
+          .then((url) => saveItem(url))
+          .catch((error) => { errorMsg.innerText = error.message; });
+      } else {
+        saveItem();
+      }
+    }
+  </script>
+</head>
 <body>
 
-<header>
-  <img src="logo.png" alt="Findero Logo" />
-  <button class="btn-logout" onclick="window.location.href='login.html'">Logout</button>
-</header>
+  <header>
+    <img src="assets/logo.png" alt="Findero Logo" />
+    <button class="btn-submit" onclick="auth.signOut().then(()=>window.location.href='login.html')">Logout</button>
+  </header>
 
-<div class="container">
-  <div class="title">Found an Item?</div>
-  <div class="subtitle">Submit details to help Findero reconnect it with the owner.</div>
+  <div class="container">
+    <div class="title">Found an Item?</div>
+    <div class="subtitle">Please share the item details to help reconnect it with the owner.</div>
 
-  <div class="card">
-    <label>Item Name</label>
-    <input type="text" placeholder="Example: Wallet, Phone, Backpack" />
+    <div class="card">
+      <label>Item Name *</label>
+      <input type="text" id="itemName" placeholder="Example: iPhone 13, Backpack, Keys" />
 
-    <label>Location Found</label>
-    <input type="text" />
+      <label>Location Found *</label>
+      <input type="text" id="locationFound" placeholder="Example: Library, School Gate, Bus Stop" />
 
-    <label>Date Found</label>
-    <input type="date" />
+      <label>Date Found *</label>
+      <input type="date" id="dateFound" />
 
-    <label>Description</label>
-    <textarea placeholder="Write details..."></textarea>
+      <label>Description</label>
+      <textarea id="description" placeholder="Describe the item..."></textarea>
 
-    <label>Upload Image</label>
-    <input type="file" />
+      <label>Upload Image (optional)</label>
+      <input type="file" id="imageUpload" accept="image/*" />
 
-    <button class="btn-submit">Submit Found Item</button>
+      <button class="btn-submit" onclick="submitItem()">Submit Found Item</button>
+
+      <div class="error" id="errorMsg"></div>
+      <div class="success" id="successMsg"></div>
+    </div>
   </div>
-</div>
+
+  <footer>
+    &copy; 2025 Findero. All rights reserved.
+  </footer>
 
 </body>
 </html>
