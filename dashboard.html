@@ -5,18 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dashboard - Findero</title>
 
-  <!-- Google Font -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 
   <style>
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: "Inter", sans-serif;
-      background: #f5f7fa;
-    }
+    body { margin: 0; padding: 0; font-family: "Inter", sans-serif; background: #f5f7fa; }
 
-    /* Header */
     header {
       background: #dcdcdc;
       padding: 16px 28px;
@@ -26,33 +19,14 @@
       box-shadow: 0 4px 10px rgba(0,0,0,0.08);
     }
 
-    header img {
-      height: 95px;
-      animation: fadeDown 0.5s ease;
-    }
-
-    @keyframes fadeDown {
-      from { opacity: 0; transform: translateY(-10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+    header img { height: 95px; }
 
     .btn-logout {
-      background: #ff7a00;
-      color: white;
-      padding: 10px 20px;
-      border-radius: 10px;
-      border: none;
-      cursor: pointer;
-      font-weight: 600;
-      transition: 0.3s ease;
+      background: #ff7a00; color: white;
+      padding: 10px 20px; border-radius: 10px;
+      border: none; cursor: pointer; font-weight: 600;
     }
 
-    .btn-logout:hover {
-      transform: scale(1.05);
-      background: #e06d00;
-    }
-
-    /* Container */
     .container {
       max-width: 900px;
       margin: 40px auto;
@@ -60,84 +34,39 @@
       text-align: center;
     }
 
-    .title {
-      font-size: 32px;
-      font-weight: 700;
-      color: #1d4ed8;
-      animation: fadeIn 0.6s ease;
-    }
-
-    .subtitle {
-      font-size: 16px;
-      color: #444;
-      margin-top: 10px;
-      margin-bottom: 35px;
-    }
+    .title { font-size: 32px; font-weight: 700; color: #1d4ed8; }
+    .subtitle { font-size: 16px; color: #444; margin-bottom: 35px; }
 
     .dash-btn {
-      width: 100%;
-      max-width: 350px;
-      padding: 15px;
-      margin: 12px auto;
-      display: block;
-      border-radius: 12px;
-      border: none;
-      font-size: 17px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: 0.3s;
-      color: white;
+      width: 100%; max-width: 360px; padding: 15px;
+      margin: 12px auto; display: block; border-radius: 12px;
+      border: none; font-size: 17px; font-weight: 700;
+      cursor: pointer; color: white;
     }
 
-    .btn-found {
-      background: #1d4ed8;
-    }
-
-    .btn-found:hover {
-      transform: scale(1.05);
-      background: #153ea8;
-    }
-
-    .btn-lost {
-      background: #ff7a00;
-    }
-
-    .btn-lost:hover {
-      transform: scale(1.05);
-      background: #e06d00;
-    }
+    .btn-search { background: #1d4ed8; }
+    .btn-submit { background: #ff7a00; }
+    .btn-track { background: #16a34a; }
 
   </style>
 </head>
 
 <body>
 
-  <!-- Header -->
-  <header>
-    <img src="logo.png" alt="Findero Logo" />
-    <button class="btn-logout" onclick="logout()">Logout</button>
-  </header>
+<header>
+  <img src="logo.png" alt="Findero Logo" />
+  <button class="btn-logout" onclick="window.location.href='login.html'">Logout</button>
+</header>
 
-  <!-- Dashboard Content -->
-  <div class="container">
-    <div class="title">Welcome to Findero</div>
-    <div class="subtitle">What would you like to do today?</div>
+<div class="container">
+  <div class="title">Welcome to Findero</div>
+  <div class="subtitle">Choose an option below:</div>
 
-    <!-- Buttons -->
-    <button class="dash-btn btn-found" onclick="window.location.href='found.html'">
-      I Found an Item
-    </button>
-
-    <button class="dash-btn btn-lost" onclick="window.location.href='lost.html'">
-      I Lost an Item
-    </button>
-  </div>
-
-  <script>
-    function logout() {
-      window.location.href = "login.html";
-    }
-  </script>
+  <!-- Working Buttons -->
+  <button class="dash-btn btn-search" onclick="window.location.href='lost.html'">Search Items</button>
+  <button class="dash-btn btn-submit" onclick="window.location.href='found.html'">Submit Found Item</button>
+  <button class="dash-btn btn-track" onclick="window.location.href='track.html'">Track Items</button>
+</div>
 
 </body>
 </html>
