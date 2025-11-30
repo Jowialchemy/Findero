@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Findero — Signup</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
 <style>
 body{margin:0;font-family:"Inter",sans-serif;background:#f5f7fa;}
 header{background:#dcdcdc;padding:14px 18px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 10px rgba(0,0,0,0.06);}
@@ -24,7 +23,7 @@ footer{background:#1d4ed8;color:#fff;text-align:center;padding:14px;margin-top:3
 <!-- Firebase SDKs -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="firebase.js"></script>
+
 </head>
 <body>
 
@@ -45,33 +44,53 @@ footer{background:#1d4ed8;color:#fff;text-align:center;padding:14px;margin-top:3
     <input type="checkbox" id="togglePass"> Show Password
   </div>
 
-  <button class="btn-submit" onclick="signupUser()">Sign Up</button>
+  <button class="btn-submit" id="signupBtn">Sign Up</button>
 </div>
 
 <footer>&copy; 2025 Findero. All rights reserved.</footer>
 
 <script>
-document.getElementById('togglePass').addEventListener('change', function(){
-  const pass = document.getElementById('password');
-  pass.type = this.checked ? 'text' : 'password';
-});
+  // --- Firebase config ---
+  const firebaseConfig = {
+    apiKey: "AIzaSyDL_BRheLzGxDJ-6XbjitZw8HFmUzQwgaI",
+    authDomain: "findero-39098.firebaseapp.com",
+    projectId: "findero-39098",
+    storageBucket: "findero-39098.appspot.com",
+    messagingSenderId: "796711693094",
+    appId: "1:796711693094:web:616efe1fd7291759d02fe7"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth(); // ✅ auth defined
 
-async function signupUser() {
-  const email = document.getElementById('email').value.trim();
-  const password = document.getElementById('password').value;
+  // Password visibility toggle
+  document.getElementById('togglePass').addEventListener('change', function(){
+    const pass = document.getElementById('password');
+    pass.type = this.checked ? 'text' : 'password';
+  });
 
-  if(!email || !password){
-    alert("Please enter both email and password.");
-    return;
-  }
+  // Signup button
+  document.getElementById('signupBtn').addEventListener('click', async () => {
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    if(!email || !password){
+      alert("Please enter both email and password.");
+      return;
+    }
+    try {
+      await auth.createUserWithEmailAndPassword(email, password);
+      window.location.href = "dashboard.html";
+    } catch(err){
+      alert("Signup failed: " + err.message);
+    }
+  });
 
-  try {
-    await auth.createUserWithEmailAndPassword(email, password);
-    window.location.href = "dashboard.html";
-  } catch (error) {
-    alert("Signup failed: " + error.message);
-  }
-}
+  // Redirect if already logged in
+  auth.onAuthStateChanged(user => {
+    if(user){
+      window.location.href = "dashboard.html";
+    }
+  });
 </script>
+
 </body>
 </html>
