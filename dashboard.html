@@ -1,78 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Findero Dashboard</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Findero - Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+body { margin:0; font-family:"Inter",sans-serif; background:#f5f7fa; }
+header { background:#dcdcdc; padding:18px 30px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 4px 12px rgba(0,0,0,0.1);}
+header img { height:95px; max-width:100%; animation:fadeDown 0.5s ease; }
+@keyframes fadeDown { from {opacity:0; transform:translateY(-10px);} to {opacity:1; transform:translateY(0);} }
 
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+.container { max-width:800px; margin:40px auto; text-align:center; }
+h1 { font-size:28px; color:#1d4ed8; margin-bottom:25px; }
+.btn { display:block; width:80%; margin:12px auto; padding:15px; background:#ff7a00; color:white; border-radius:12px; font-size:17px; font-weight:700; text-decoration:none; transition:0.3s ease; }
+.btn:hover { background:#e06d00; transform:scale(1.05); }
+footer { background:#1d4ed8; color:white; text-align:center; padding:20px; position:fixed; bottom:0; width:100%; }
+</style>
 
-  <style>
-    body { margin:0; font-family:"Inter",sans-serif; background:#f5f7fa; }
-    header { background:#dcdcdc; padding:18px 30px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 4px 12px rgba(0,0,0,0.1);}
-    header img { height:95px; animation:fadeDown 0.5s ease; }
-    @keyframes fadeDown { from {opacity:0; transform:translateY(-10px);} to {opacity:1; transform:translateY(0);} }
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script>
+const firebaseConfig = {
+apiKey: "AIzaSyDL_BRheLzGxDJ-6XbjitZw8HFmUzQwgaI",
+authDomain: "findero-39098.firebaseapp.com",
+projectId: "findero-39098",
+storageBucket: "findero-39098.appspot.com",
+messagingSenderId: "796711693094",
+appId: "1:796711693094:web:616efe1fd7291759d02fe7"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
 
-    .container { max-width:900px; margin:40px auto; padding:20px; text-align:center; }
-    h1 { font-size:32px; font-weight:700; color:#1d4ed8; margin-bottom:20px; }
-    .btn-group { display:flex; flex-wrap:wrap; justify-content:center; gap:20px; margin-top:30px; }
-    .btn-main { background:#ff7a00; padding:20px 30px; color:white; font-size:18px; font-weight:700; border:none; border-radius:12px; cursor:pointer; transition:0.3s ease; }
-    .btn-main:hover { transform:scale(1.05); background:#e06d00; }
-    footer { background:#1d4ed8; color:white; text-align:center; padding:20px; position:fixed; bottom:0; width:100%; }
-  </style>
+// Redirect if not logged in
+auth.onAuthStateChanged(user => { if(!user) window.location.href="login.html"; });
 
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
-
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyDL_BRheLzGxDJ-6XbjitZw8HFmUzQwgaI",
-      authDomain: "findero-39098.firebaseapp.com",
-      projectId: "findero-39098",
-      storageBucket: "findero-39098.appspot.com",
-      messagingSenderId: "796711693094",
-      appId: "1:796711693094:web:616efe1fd7291759d02fe7"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-
-    // Redirect to login if user is not logged in
-    auth.onAuthStateChanged((user) => {
-      if (!user) {
-        window.location.href = "login.html";
-      }
-    });
-
-    function logout() {
-      auth.signOut().then(() => {
-        window.location.href = "login.html";
-      });
-    }
-  </script>
+function logout(){ auth.signOut().then(()=>window.location.href="login.html"); }
+</script>
 </head>
 <body>
+<header>
+<img src="assets/logo.png" alt="Findero Logo" />
+<button class="btn" style="width:auto;margin:0;" onclick="logout()">Logout</button>
+</header>
 
-  <header>
-    <img src="assets/logo.png" alt="Findero Logo" />
-    <button class="btn-main" onclick="logout()">Logout</button>
-  </header>
+<div class="container">
+<h1>Dashboard</h1>
+<a href="found.html" class="btn">Submit Found Item</a>
+<a href="lost.html" class="btn">Search Lost Items</a>
+<a href="track.html" class="btn">Track Item by ID</a>
+</div>
 
-  <div class="container">
-    <h1>Welcome to Your Dashboard</h1>
-    <div class="btn-group">
-      <button class="btn-main" onclick="location.href='lost.html'">Search Items</button>
-      <button class="btn-main" onclick="location.href='found.html'">Submit Items</button>
-      <button class="btn-main" onclick="location.href='track.html'">Track Items</button>
-      <button class="btn-main" onclick="alert('Admin Dashboard Coming Soon')">Admin Dashboard</button>
-    </div>
-  </div>
-
-  <footer>
-    &copy; 2025 Findero. All rights reserved.
-  </footer>
-
+<footer>&copy; 2025 Findero. All rights reserved.</footer>
 </body>
 </html>
