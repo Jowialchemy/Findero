@@ -3,66 +3,108 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Search Lost Items - Findero</title>
+  <title>Findero - Search Lost Items</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 
   <style>
-    body { margin: 0; padding: 0; font-family: "Inter", sans-serif; background: #f5f7fa; }
+    body { margin:0; font-family:"Inter",sans-serif; background:#f5f7fa; }
+    header { background:#dcdcdc; padding:18px 30px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 4px 12px rgba(0,0,0,0.1);}
+    header img { height:95px; animation:fadeDown 0.5s ease; }
+    @keyframes fadeDown { from {opacity:0; transform:translateY(-10px);} to {opacity:1; transform:translateY(0);} }
 
-    header {
-      background: #dcdcdc; padding: 16px 28px;
-      display: flex; justify-content: space-between; align-items: center;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-    }
-
-    header img { height: 95px; }
-
-    .btn-logout {
-      background: #ff7a00; color: white;
-      padding: 10px 20px; border-radius: 10px;
-      border: none; cursor: pointer; font-weight: 600;
-    }
-
-    .container {
-      max-width: 900px; margin: 40px auto; padding: 20px;
-    }
-
-    .title { font-size: 30px; font-weight: 700; color: #1d4ed8; text-align: center; }
-    .subtitle { text-align: center; color: #444; margin-bottom: 30px; }
-
-    .search-box input {
-      width: 100%; padding: 14px; border: 1px solid #ccc;
-      border-radius: 12px; background: #f9f9f9; font-size: 16px;
-    }
-
-    .results {
-      margin-top: 25px; background: white;
-      padding: 20px; border-radius: 12px; box-shadow: 0 6px 14px rgba(0,0,0,0.1);
-    }
-
+    .container { max-width:900px; margin:40px auto; padding:20px; }
+    .title { text-align:center; font-size:30px; font-weight:700; color:#1d4ed8; margin-bottom:15px; }
+    .subtitle { text-align:center; font-size:16px; color:#444; margin-bottom:30px; }
+    input { width:100%; padding:12px; margin-top:6px; border:1px solid #ccc; border-radius:10px; font-size:15px; background:#f9f9f9; }
+    .btn-search { width:100%; margin-top:20px; padding:14px; background:#ff7a00; color:white; border-radius:12px; font-size:17px; font-weight:700; cursor:pointer; border:none; transition:0.3s ease; }
+    .btn-search:hover { transform:scale(1.05); background:#e06d00; }
+    .results { margin-top:30px; }
+    .card { background:white; padding:20px; border-radius:14px; box-shadow:0 6px 14px rgba(0,0,0,0.1); margin-bottom:20px; }
+    footer { background:#1d4ed8; color:white; text-align:center; padding:20px; position:fixed; bottom:0; width:100%; }
+    .error { color:red; text-align:center; margin-top:10px; }
   </style>
-</head>
 
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDL_BRheLzGxDJ-6XbjitZw8HFmUzQwgaI",
+      authDomain: "findero-39098.firebaseapp.com",
+      projectId: "findero-39098",
+      storageBucket: "findero-39098.appspot.com",
+      messagingSenderId: "796711693094",
+      appId: "1:796711693094:web:616efe1fd7291759d02fe7"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // Redirect if not logged in
+    auth.onAuthStateChanged((user) => {
+      if (!user) window.location.href = "login.html";
+    });
+
+    function searchItems() {
+      const queryValue = document.getElementById("searchInput").value.trim().toLowerCase();
+      const resultsContainer = document.getElementById("results");
+      resultsContainer.innerHTML = "";
+
+      if (!queryValue) return;
+
+      db.collection("foundItems").get()
+        .then(snapshot => {
+          let found = false;
+          snapshot.forEach(doc => {
+            const item = doc.data();
+            const nameMatch = item.itemName.toLowerCase().includes(queryValue);
+            const locationMatch = item.locationFound.toLowerCase().includes(queryValue);
+            const dateMatch = item.dateFound && item.dateFound.includes(queryValue);
+
+            if (nameMatch || locationMatch || dateMatch) {
+              found = true;
+              resultsContainer.innerHTML += `
+                <div class="card">
+                  <strong>${item.itemName}</strong><br/>
+                  Location: ${item.locationFound}<br/>
+                  Date: ${item.dateFound}<br/>
+                  Description: ${item.description || "-"}<br/>
+                  ${item.imageUrl ? `<img src="${item.imageUrl}" style="max-width:100%; margin-top:10px; border-radius:10px;">` : ""}
+                </div>
+              `;
+            }
+          });
+          if (!found) resultsContainer.innerHTML = '<p class="error">No items found matching your search.</p>';
+        })
+        .catch(error => {
+          resultsContainer.innerHTML = `<p class="error">${error.message}</p>`;
+        });
+    }
+  </script>
+</head>
 <body>
 
-<header>
-  <img src="logo.png" alt="Findero Logo">
-  <button class="btn-logout" onclick="window.location.href='login.html'">Logout</button>
-</header>
+  <header>
+    <img src="assets/logo.png" alt="Findero Logo" />
+    <button class="btn-search" onclick="auth.signOut().then(()=>window.location.href='login.html')">Logout</button>
+  </header>
 
-<div class="container">
-  <div class="title">Search Lost Items</div>
-  <div class="subtitle">Search for items submitted by others.</div>
+  <div class="container">
+    <div class="title">Search Lost Items</div>
+    <div class="subtitle">Enter the item name, location, or date to find lost items.</div>
 
-  <div class="search-box">
-    <input type="text" placeholder="Search item name...">
+    <input type="text" id="searchInput" placeholder="Search by item, location or date..." />
+    <button class="btn-search" onclick="searchItems()">Search</button>
+
+    <div class="results" id="results"></div>
   </div>
 
-  <div class="results">
-    <p>No items found. (Static page for now)</p>
-  </div>
-</div>
+  <footer>
+    &copy; 2025 Findero. All rights reserved.
+  </footer>
 
 </body>
 </html>
