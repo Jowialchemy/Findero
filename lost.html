@@ -1,155 +1,95 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Findero - Lost Item</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Findero — Lost Item</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-body { margin:0; font-family:"Inter",sans-serif; background:#f5f7fa; }
-header { background:#dcdcdc; padding:18px 30px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 4px 12px rgba(0,0,0,0.1);}
-header img { height:95px; max-width:100%; animation:fadeDown 0.5s ease; }
-@keyframes fadeDown { from{opacity:0; transform:translateY(-10px);} to{opacity:1; transform:translateY(0);} }
-
-.container { max-width:900px; margin:40px auto; padding:20px; }
-.title { text-align:center; font-size:30px; font-weight:700; color:#1d4ed8; margin-bottom:15px; }
-.subtitle { text-align:center; font-size:16px; color:#444; margin-bottom:30px; }
-.card { background:white; padding:25px; border-radius:14px; box-shadow:0 6px 14px rgba(0,0,0,0.1); margin-bottom:30px; }
-
-label { font-size:15px; font-weight:600; color:#333; display:block; margin-top:12px; }
-input, textarea { width:100%; padding:12px; margin-top:6px; border:1px solid #ccc; border-radius:10px; font-size:15px; background:#f9f9f9; }
-textarea { height:120px; resize:none; }
-
-.btn-submit { width:100%; margin-top:20px; padding:14px; background:#ff7a00; color:white; border-radius:12px; font-size:17px; font-weight:700; cursor:pointer; border:none; transition:0.3s ease; }
-.btn-submit:hover { transform:scale(1.05); background:#e06d00; }
-
-.error { color:red; margin-top:10px; text-align:center; }
-.success { color:green; margin-top:10px; text-align:center; }
-
-footer { background:#1d4ed8; color:white; text-align:center; padding:20px; margin-top:40px; }
+body{margin:0;font-family:"Inter",sans-serif;background:#f5f7fa;color:#111}
+header{background:#dcdcdc;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 4px 10px rgba(0,0,0,0.06)}
+header img{height:95px;animation:fadeDown .45s ease}
+@keyframes fadeDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+.container{max-width:720px;margin:36px auto;padding:20px}
+h1{text-align:center;color:#1d4ed8;margin-bottom:16px}
+label{display:block;margin-top:12px;font-weight:600}
+input,textarea{width:100%;padding:12px;margin-top:6px;border-radius:10px;border:1px solid #ccc;font-size:15px;background:#fff}
+textarea{height:120px;resize:none}
+.btn-submit{width:100%;margin-top:20px;padding:14px;background:#ff7a00;color:#fff;font-weight:700;border:none;border-radius:12px;cursor:pointer;transition:.2s}
+.btn-submit:hover{background:#e06d00;transform:scale(1.05)}
+.error{background:#fff6f6;border:1px solid #ffd6d6;color:#b00020;padding:12px;border-radius:10px;text-align:center;margin-top:12px}
+footer{background:#1d4ed8;color:#fff;text-align:center;padding:14px;position:fixed;left:0;right:0;bottom:0}
+.logout{background:#1d4ed8;color:#fff;border:0;padding:10px 14px;border-radius:10px;cursor:pointer}
 </style>
 
-<!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+<script src="firebase.js"></script>
 
 <script>
-// Firebase init
-const firebaseConfig = {
-  apiKey: "AIzaSyDL_BRheLzGxDJ-6XbjitZw8HFmUzQwgaI",
-  authDomain: "findero-39098.firebaseapp.com",
-  projectId: "findero-39098",
-  storageBucket: "findero-39098.appspot.com",
-  messagingSenderId: "796711693094",
-  appId: "1:796711693094:web:616efe1fd7291759d02fe7"
-};
-firebase.initializeApp(firebaseConfig);
+auth.onAuthStateChanged(user=>{ if(!user) window.location.href='login.html'; });
+function logout(){ auth.signOut().then(()=>window.location.href='login.html'); }
 
-const auth = firebase.auth();
-const db = firebase.firestore();
-const storage = firebase.storage();
+async function submitLost(event){
+    event.preventDefault();
+    const name=document.getElementById('itemName').value.trim();
+    const location=document.getElementById('locationLost').value.trim();
+    const date=document.getElementById('dateLost').value;
+    const desc=document.getElementById('description').value.trim();
+    const file=document.getElementById('imageUpload').files[0];
+    const errorDiv=document.getElementById('error');
+    errorDiv.innerHTML='';
 
-// Redirect if not logged in
-auth.onAuthStateChanged(user => {
-  if (!user) window.location.href = "login.html";
-});
+    if(!name||!location||!date){ errorDiv.innerText='Please fill all required fields.'; return; }
 
-function logout() {
-  auth.signOut().then(() => window.location.href = "login.html");
-}
-
-async function submitLostItem() {
-  const name = document.getElementById("lostName").value.trim();
-  const location = document.getElementById("lostLocation").value.trim();
-  const date = document.getElementById("lostDate").value;
-  const desc = document.getElementById("lostDesc").value.trim();
-  const image = document.getElementById("lostImage").files[0];
-
-  const errorMsg = document.getElementById("errorMsg");
-  const successMsg = document.getElementById("successMsg");
-
-  errorMsg.innerText = "";
-  successMsg.innerText = "";
-
-  if (!name || !location || !date) {
-    errorMsg.innerText = "Please fill all required fields.";
-    return;
-  }
-
-  try {
-    let docRef = db.collection("lostItems").doc();
-
-    let data = {
-      itemName: name,
-      lostLocation: location,
-      lostDate: date,
-      description: desc,
-      trackingId: docRef.id,
-      createdBy: auth.currentUser.uid,
-      createdAt: new Date()
-    };
-
-    // Upload image if provided
-    if (image) {
-      let storageRef = storage.ref(`lostItems/${docRef.id}/${image.name}`);
-      await storageRef.put(image);
-      let url = await storageRef.getDownloadURL();
-      data.imageUrl = url;
-    }
-
-    await docRef.set(data);
-
-    successMsg.innerHTML = `Lost item submitted!<br><strong>Tracking ID: ${docRef.id}</strong>`;
-
-    // reset form
-    document.getElementById("lostName").value = "";
-    document.getElementById("lostLocation").value = "";
-    document.getElementById("lostDate").value = "";
-    document.getElementById("lostDesc").value = "";
-    document.getElementById("lostImage").value = "";
-
-  } catch (err) {
-    errorMsg.innerText = err.message;
-  }
+    try{
+        const trackingId=Math.random().toString(36).substr(2,9);
+        let imageUrl='';
+        if(file){
+            const storageRef=storage.ref().child(`lostImages/${trackingId}_${file.name}`);
+            await storageRef.put(file);
+            imageUrl=await storageRef.getDownloadURL();
+        }
+        await db.collection('lostItems').doc(trackingId).set({
+            itemName:name,
+            lostLocation:location,
+            lostDate:date,
+            description:desc,
+            imageUrl:imageUrl,
+            trackingId:trackingId,
+            timestamp:firebase.firestore.FieldValue.serverTimestamp()
+        });
+        alert('Lost item submitted! Tracking ID: '+trackingId);
+        document.getElementById('lostForm').reset();
+    }catch(err){ errorDiv.innerText=err.message; }
 }
 </script>
 </head>
-
 <body>
 <header>
-  <img src="assets/logo.png" alt="Findero Logo" />
-  <button class="btn-submit" style="width:auto;" onclick="logout()">Logout</button>
+<img src="assets/logo.png" alt="Findero Logo">
+<button class="logout" onclick="logout()">Logout</button>
 </header>
 
-<div class="container">
-  <div class="title">Lost an Item?</div>
-  <div class="subtitle">Please describe the item you lost so Findero can help locate it.</div>
-
-  <div class="card">
-    <label>Item Name</label>
-    <input type="text" id="lostName" placeholder="Example: Wallet, ID Card, Headphones" />
-
-    <label>Where Did You Lose It?</label>
-    <input type="text" id="lostLocation" placeholder="Example: Airport, Bus Stop, Class" />
-
-    <label>Date Lost</label>
-    <input type="date" id="lostDate" />
-
-    <label>Description</label>
-    <textarea id="lostDesc" placeholder="Describe the item..."></textarea>
-
-    <label>Upload Image (optional)</label>
-    <input type="file" id="lostImage" accept="image/*" />
-
-    <button class="btn-submit" onclick="submitLostItem()">Submit Lost Item</button>
-
-    <div id="errorMsg" class="error"></div>
-    <div id="successMsg" class="success"></div>
-  </div>
-</div>
+<main class="container">
+<h1>Submit Lost Item</h1>
+<div id="error" class="error"></div>
+<form id="lostForm" onsubmit="submitLost(event)">
+<label>Item Name</label>
+<input type="text" id="itemName" placeholder="Example: iPhone, Keys, Backpack">
+<label>Location Lost</label>
+<input type="text" id="locationLost" placeholder="Example: Library, School Gate">
+<label>Date Lost</label>
+<input type="date" id="dateLost">
+<label>Description</label>
+<textarea id="description" placeholder="Describe the item..."></textarea>
+<label>Upload Image (optional)</label>
+<input type="file" id="imageUpload" accept="image/*">
+<button class="btn-submit" type="submit">Submit Lost Item</button>
+</form>
+</main>
 
 <footer>&copy; 2025 Findero. All rights reserved.</footer>
 </body>
