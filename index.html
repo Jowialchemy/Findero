@@ -5,103 +5,53 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Findero - Lost & Found Made Easy</title>
 
-  <!-- Google Font -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 
   <style>
-    body {
-      margin: 0;
-      font-family: "Inter", sans-serif;
-      background: #f5f7fa;
-    }
-
-    /* Header */
-    header {
-      background: #dcdcdc;
-      padding: 18px 30px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    header img {
-      height: 80px;
-      animation: fadeDown 0.5s ease;
-    }
-
-    @keyframes fadeDown {
-      from { opacity: 0; transform: translateY(-10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* Hero Section */
-    .hero {
-      max-width: 950px;
-      margin: 80px auto;
-      text-align: center;
-      padding: 20px;
-      animation: fadeIn 0.7s ease;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(15px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .hero-title {
-      font-size: 38px;
-      font-weight: 700;
-      color: #1d4ed8;
-    }
-
-    .hero-sub {
-      font-size: 18px;
-      color: #444;
-      margin-top: 12px;
-      line-height: 1.5;
-    }
-
-    .btn-group {
-      margin-top: 40px;
-      display: flex;
-      justify-content: center;
-      gap: 20px;
-    }
-
-    .btn-main {
-      background: #ff7a00;
-      padding: 14px 30px;
-      color: white;
-      font-size: 18px;
-      font-weight: 700;
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
-      transition: 0.3s ease;
-    }
-
-    .btn-main:hover {
-      transform: scale(1.05);
-      background: #e06d00;
-    }
+    body { margin:0; font-family:"Inter",sans-serif; background:#f5f7fa; }
+    header { background:#dcdcdc; padding:18px 30px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 4px 12px rgba(0,0,0,0.1);}
+    header img { height:80px; animation:fadeDown 0.5s ease; }
+    @keyframes fadeDown { from {opacity:0; transform:translateY(-10px);} to {opacity:1; transform:translateY(0);} }
+    .hero { max-width:850px; margin:80px auto; text-align:center; padding:20px; animation:fadeIn 0.7s ease;}
+    @keyframes fadeIn { from {opacity:0; transform:translateY(15px);} to {opacity:1; transform:translateY(0);} }
+    .hero-title { font-size:38px; font-weight:700; color:#1d4ed8; }
+    .hero-sub { font-size:18px; color:#444; margin-top:12px; line-height:1.5; }
+    .btn-group { margin-top:40px; display:flex; justify-content:center; gap:20px; flex-wrap:wrap;}
+    .btn-main { background:#ff7a00; padding:14px 30px; color:white; font-size:18px; font-weight:700; border:none; border-radius:12px; cursor:pointer; transition:0.3s ease; }
+    .btn-main:hover { transform:scale(1.05); background:#e06d00; }
+    footer { background:#1d4ed8; color:white; text-align:center; padding:20px; position:fixed; bottom:0; width:100%; }
   </style>
 
-</head>
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 
+  <script>
+    // Firebase Config
+    const firebaseConfig = {
+      apiKey: "AIzaSyDL_BRheLzGxDJ-6XbjitZw8HFmUzQwgaI",
+      authDomain: "findero-39098.firebaseapp.com",
+      projectId: "findero-39098",
+      storageBucket: "findero-39098.appspot.com",
+      messagingSenderId: "796711693094",
+      appId: "1:796711693094:web:616efe1fd7291759d02fe7"
+    };
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+  </script>
+</head>
 <body>
 
-  <!-- Header -->
   <header>
-    <img src="logo.png" alt="Findero Logo" />
+    <img src="assets/logo.png" alt="Findero Logo" />
   </header>
 
-  <!-- Hero Section -->
   <div class="hero">
     <div class="hero-title">Welcome to Findero</div>
     <div class="hero-sub">
-      Your trusted platform to report, track, and recover lost & found items.  
-      Fast, secure, and designed to reconnect owners with their belongings.
+      Your trusted platform to report, track, and recover lost & found items. Fast, secure, and designed to reconnect owners with their belongings.
     </div>
 
     <div class="btn-group">
@@ -109,6 +59,10 @@
       <button class="btn-main" onclick="location.href='signup.html'">Create Account</button>
     </div>
   </div>
+
+  <footer>
+    &copy; 2025 Findero. All rights reserved.
+  </footer>
 
 </body>
 </html>
