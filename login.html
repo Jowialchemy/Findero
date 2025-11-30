@@ -1,98 +1,81 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Findero - Login</title> 
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Findero - Login</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+body { margin:0; font-family:"Inter",sans-serif; background:#f5f7fa; }
+header { background:#dcdcdc; padding:18px 30px; display:flex; justify-content:center; align-items:center; box-shadow:0 4px 12px rgba(0,0,0,0.1);}
+header img { height:95px; max-width:100%; animation:fadeDown 0.5s ease; }
+@keyframes fadeDown { from {opacity:0; transform:translateY(-10px);} to {opacity:1; transform:translateY(0);} }
 
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" /> 
+.container { max-width:400px; margin:80px auto; background:white; padding:30px; border-radius:14px; box-shadow:0 6px 14px rgba(0,0,0,0.1); }
+.title { font-size:28px; font-weight:700; color:#1d4ed8; text-align:center; margin-bottom:15px; }
+input { width:100%; padding:12px; margin:10px 0; border-radius:10px; border:1px solid #ccc; font-size:15px; }
+.btn-submit { width:100%; padding:14px; background:#ff7a00; color:white; border:none; border-radius:12px; font-size:17px; font-weight:700; cursor:pointer; transition:0.3s ease; }
+.btn-submit:hover { background:#e06d00; transform:scale(1.05); }
+.link { text-align:center; margin-top:15px; font-size:14px; }
+.link a { color:#1d4ed8; text-decoration:none; }
+.link a:hover { text-decoration:underline; }
+.error { color:red; font-size:14px; margin-top:5px; text-align:center; }
+.password-container { position:relative; }
+.toggle-password { position:absolute; right:12px; top:12px; cursor:pointer; font-size:18px; }
+footer { background:#1d4ed8; color:white; text-align:center; padding:20px; position:fixed; bottom:0; width:100%; }
+</style>
 
-  <style>
-    body { margin:0; font-family:"Inter",sans-serif; background:#f5f7fa; }
-    header { background:#dcdcdc; padding:18px 30px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 4px 12px rgba(0,0,0,0.1);}
-    header img { height:95px; animation:fadeDown 0.5s ease; }
-    @keyframes fadeDown { from {opacity:0; transform:translateY(-10px);} to {opacity:1; transform:translateY(0);} } 
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script>
+const firebaseConfig = {
+apiKey: "AIzaSyDL_BRheLzGxDJ-6XbjitZw8HFmUzQwgaI",
+authDomain: "findero-39098.firebaseapp.com",
+projectId: "findero-39098",
+storageBucket: "findero-39098.appspot.com",
+messagingSenderId: "796711693094",
+appId: "1:796711693094:web:616efe1fd7291759d02fe7"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
 
-    .container { max-width:400px; margin:80px auto; background:white; padding:30px; border-radius:14px; box-shadow:0 6px 14px rgba(0,0,0,0.1); }
-    .title { font-size:28px; font-weight:700; color:#1d4ed8; text-align:center; margin-bottom:15px; }
-    input { width:100%; padding:12px; margin:10px 0; border-radius:10px; border:1px solid #ccc; font-size:15px; }
-    .btn-submit { width:100%; padding:14px; background:#ff7a00; color:white; border:none; border-radius:12px; font-size:17px; font-weight:700; cursor:pointer; transition:0.3s ease; }
-    .btn-submit:hover { background:#e06d00; transform:scale(1.05); }
-    .link { text-align:center; margin-top:15px; font-size:14px; }
-    .link a { color:#1d4ed8; text-decoration:none; }
-    .link a:hover { text-decoration:underline; }
-    footer { background:#1d4ed8; color:white; text-align:center; padding:20px; position:fixed; bottom:0; width:100%; }
-    .error { color:red; font-size:14px; margin-top:5px; text-align:center; }
-  </style> 
+// Redirect if logged in
+auth.onAuthStateChanged(user => { if(user) window.location.href="dashboard.html"; });
 
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script> 
+function login() {
+const email=document.getElementById("email").value;
+const password=document.getElementById("password").value;
+const errorMsg=document.getElementById("errorMsg"); errorMsg.innerText="";
+if(!email || !password){errorMsg.innerText="Enter email and password."; return;}
+auth.signInWithEmailAndPassword(email,password).then(()=>window.location.href="dashboard.html")
+.catch(err=>errorMsg.innerText=err.message);
+}
 
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyDL_BRheLzGxDJ-6XbjitZw8HFmUzQwgaI",
-      authDomain: "findero-39098.firebaseapp.com",
-      projectId: "findero-39098",
-      storageBucket: "findero-39098.appspot.com",
-      messagingSenderId: "796711693094",
-      appId: "1:796711693094:web:616efe1fd7291759d02fe7"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-  </script>
+function togglePassword(){
+const pwd=document.getElementById("password");
+pwd.type = pwd.type==="password"?"text":"password";
+}
+</script>
+
 </head>
-<body> 
+<body>
+<header>
+<img src="assets/logo.png" alt="Findero Logo" />
+</header>
 
-  <header>
-    <img src="assets/logo.png" alt="Findero Logo" />
-  </header> 
+<div class="container">
+<div class="title">Login</div>
+<input type="email" id="email" placeholder="Email" required />
+<div class="password-container">
+<input type="password" id="password" placeholder="Password" required />
+<span class="toggle-password" onclick="togglePassword()">👁️</span>
+</div>
 
-  <div class="container">
-    <div class="title">Login to Findero</div> 
+<button class="btn-submit" onclick="login()">Login</button>
+<div class="error" id="errorMsg"></div>
+<div class="link">Don't have an account? <a href="signup.html">Sign Up</a></div>
+</div>
 
-    <input type="email" id="email" placeholder="Email" required />
-    <input type="password" id="password" placeholder="Password" required />
-    <button class="btn-submit" onclick="login()">Login</button> 
-
-    <div class="error" id="errorMsg"></div> 
-
-    <div class="link">
-      Don't have an account? <a href="signup.html">Sign up</a>
-    </div>
-  </div> 
-
-  <footer>
-    &copy; 2025 Findero. All rights reserved.
-  </footer> 
-
-  <script>
-    function login() {
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
-      const errorMsg = document.getElementById("errorMsg"); 
-
-      auth.signInWithEmailAndPassword(email, password)
-        .then((userCredential) => {
-          const user = userCredential.user; 
-
-          // Optional: check if email is verified
-          if (!user.emailVerified) {
-            errorMsg.innerText = "Please verify your email before logging in.";
-            auth.signOut();
-            return;
-          } 
-
-          // Redirect to dashboard
-          window.location.href = "dashboard.html";
-        })
-        .catch((error) => {
-          errorMsg.innerText = error.message;
-        });
-    }
-  </script> 
-
+<footer>&copy; 2025 Findero. All rights reserved.</footer>
 </body>
 </html>
