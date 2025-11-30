@@ -3,249 +3,66 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Lost Items</title>
+  <title>Search Lost Items - Findero</title>
 
-  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 
   <style>
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: "Inter", sans-serif;
-      background: #f5f7fa;
-    }
+    body { margin: 0; padding: 0; font-family: "Inter", sans-serif; background: #f5f7fa; }
 
-    /* Header */
     header {
-      background: #dcdcdc;
-      padding: 16px 28px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      background: #dcdcdc; padding: 16px 28px;
+      display: flex; justify-content: space-between; align-items: center;
       box-shadow: 0 4px 10px rgba(0,0,0,0.08);
     }
 
-    header img {
-      height: 95px;
-      animation: fadeDown 0.5s ease;
-    }
-
-    @keyframes fadeDown {
-      from { opacity: 0; transform: translateY(-10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    nav {
-      display: flex;
-      gap: 20px;
-      align-items: center;
-    }
-
-    nav a {
-      text-decoration: none;
-      font-weight: 600;
-      color: #1d4ed8;
-      transition: 0.3s;
-    }
-
-    nav a:hover {
-      color: #ff7a00;
-    }
+    header img { height: 95px; }
 
     .btn-logout {
-      background: #ff7a00;
-      color: white;
-      padding: 10px 20px;
-      border-radius: 10px;
-      border: none;
-      cursor: pointer;
-      font-weight: 600;
-      transition: 0.3s ease;
+      background: #ff7a00; color: white;
+      padding: 10px 20px; border-radius: 10px;
+      border: none; cursor: pointer; font-weight: 600;
     }
 
-    .btn-logout:hover {
-      transform: scale(1.05);
-      background: #e06d00;
-    }
-
-    /* Page Container */
     .container {
-      max-width: 900px;
-      margin: 40px auto;
-      padding: 20px;
+      max-width: 900px; margin: 40px auto; padding: 20px;
     }
 
-    .title {
-      text-align: center;
-      font-size: 30px;
-      font-weight: 700;
-      margin-bottom: 15px;
-      color: #1d4ed8;
-      animation: fadeIn 0.6s ease;
+    .title { font-size: 30px; font-weight: 700; color: #1d4ed8; text-align: center; }
+    .subtitle { text-align: center; color: #444; margin-bottom: 30px; }
+
+    .search-box input {
+      width: 100%; padding: 14px; border: 1px solid #ccc;
+      border-radius: 12px; background: #f9f9f9; font-size: 16px;
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
+    .results {
+      margin-top: 25px; background: white;
+      padding: 20px; border-radius: 12px; box-shadow: 0 6px 14px rgba(0,0,0,0.1);
     }
 
-    .subtitle {
-      text-align: center;
-      font-size: 16px;
-      color: #444;
-      margin-bottom: 30px;
-    }
-
-    /* Card */
-    .card {
-      background: white;
-      padding: 25px;
-      border-radius: 14px;
-      box-shadow: 0 6px 14px rgba(0,0,0,0.1);
-      margin-bottom: 30px;
-      animation: fadeIn 0.8s ease;
-    }
-
-    label {
-      font-size: 15px;
-      font-weight: 600;
-      color: #333;
-      display: block;
-      margin-top: 12px;
-    }
-
-    input, textarea, select {
-      width: 100%;
-      padding: 12px;
-      margin-top: 6px;
-      border: 1px solid #ccc;
-      border-radius: 10px;
-      font-size: 15px;
-      background: #f9f9f9;
-    }
-
-    textarea {
-      height: 120px;
-      resize: none;
-    }
-
-    .btn-submit {
-      width: 100%;
-      margin-top: 20px;
-      padding: 14px;
-      background: #ff7a00;
-      color: white;
-      border-radius: 12px;
-      font-size: 17px;
-      font-weight: 700;
-      cursor: pointer;
-      border: none;
-      transition: 0.3s ease;
-    }
-
-    .btn-submit:hover {
-      transform: scale(1.05);
-      background: #e06d00;
-    }
-
-    #preview {
-      display: none;
-      width: 150px;
-      margin-top: 10px;
-      border-radius: 8px;
-    }
   </style>
 </head>
 
 <body>
 
-  <!-- Header -->
-  <header>
-    <img src="logo.png" alt="Logo" />
-    <nav>
-      <a href="found.html">Found Items</a>
-      <a href="lost.html">Lost Items</a>
-    </nav>
-    <button class="btn-logout" onclick="logout()">Logout</button>
-  </header>
+<header>
+  <img src="logo.png" alt="Findero Logo">
+  <button class="btn-logout" onclick="window.location.href='login.html'">Logout</button>
+</header>
 
-  <!-- Page Content -->
-  <div class="container">
-    <div class="title">Lost an Item?</div>
-    <div class="subtitle">Please share the item details so we can help you find it.</div>
+<div class="container">
+  <div class="title">Search Lost Items</div>
+  <div class="subtitle">Search for items submitted by others.</div>
 
-    <div class="card">
-      <label for="itemName">Item Name</label>
-      <input type="text" id="itemName" placeholder="Example: iPhone 13, Backpack, Keys" />
-
-      <label for="lastSeenLocation">Last Seen Location</label>
-      <input type="text" id="lastSeenLocation" placeholder="Example: Library, School Gate, Bus Stop" />
-
-      <label for="dateLost">Date Lost</label>
-      <input type="date" id="dateLost" />
-
-      <label for="description">Description</label>
-      <textarea id="description" placeholder="Describe the item..."></textarea>
-
-      <label for="imageUpload">Upload Image (optional)</label>
-      <input type="file" id="imageUpload" accept="image/*" />
-      <img id="preview" src="" alt="Preview Image" />
-
-      <button class="btn-submit">Submit Lost Item</button>
-    </div>
+  <div class="search-box">
+    <input type="text" placeholder="Search item name...">
   </div>
 
-  <script>
-    function logout() {
-      window.location.href = "login.html";
-    }
-
-    // Image Preview
-    const imageInput = document.getElementById('imageUpload');
-    const preview = document.getElementById('preview');
-    imageInput.addEventListener('change', () => {
-      const file = imageInput.files[0];
-      if(file){
-        preview.src = URL.createObjectURL(file);
-        preview.style.display = 'block';
-      } else {
-        preview.style.display = 'none';
-      }
-    });
-
-    // Form Submission
-    document.querySelector('.btn-submit').addEventListener('click', function() {
-      const itemName = document.getElementById('itemName').value;
-      const lastSeenLocation = document.getElementById('lastSeenLocation').value;
-      const dateLost = document.getElementById('dateLost').value;
-      const description = document.getElementById('description').value;
-      const imageFile = document.getElementById('imageUpload').files[0];
-
-      if (!itemName || !lastSeenLocation || !dateLost || !description) {
-        alert('Please fill in all required fields.');
-        return;
-      }
-
-      console.log({
-        itemName,
-        lastSeenLocation,
-        dateLost,
-        description,
-        imageFile
-      });
-
-      alert('Item submitted successfully!');
-
-      // Clear form
-      document.getElementById('itemName').value = '';
-      document.getElementById('lastSeenLocation').value = '';
-      document.getElementById('dateLost').value = '';
-      document.getElementById('description').value = '';
-      document.getElementById('imageUpload').value = '';
-      preview.style.display = 'none';
-    });
-  </script>
+  <div class="results">
+    <p>No items found. (Static page for now)</p>
+  </div>
+</div>
 
 </body>
-  </html>
+</html>
