@@ -1,149 +1,99 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Findero - Submit Found Item</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Findero - Found Item</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+body { margin:0; font-family:"Inter",sans-serif; background:#f5f7fa; }
+header { background:#dcdcdc; padding:18px 30px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 4px 12px rgba(0,0,0,0.1);}
+header img { height:95px; max-width:100%; animation:fadeDown 0.5s ease; }
+@keyframes fadeDown { from {opacity:0; transform:translateY(-10px);} to {opacity:1; transform:translateY(0);} }
 
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+.container { max-width:900px; margin:40px auto; padding:20px; }
+.title { text-align:center; font-size:30px; font-weight:700; color:#1d4ed8; margin-bottom:15px; }
+.subtitle { text-align:center; font-size:16px; color:#444; margin-bottom:30px; }
+.card { background:white; padding:25px; border-radius:14px; box-shadow:0 6px 14px rgba(0,0,0,0.1); margin-bottom:30px; }
+label { font-size:15px; font-weight:600; color:#333; display:block; margin-top:12px; }
+input, textarea { width:100%; padding:12px; margin-top:6px; border:1px solid #ccc; border-radius:10px; font-size:15px; background:#f9f9f9; }
+textarea { height:120px; resize:none; }
+.btn-submit { width:100%; margin-top:20px; padding:14px; background:#ff7a00; color:white; border-radius:12px; font-size:17px; font-weight:700; cursor:pointer; border:none; transition:0.3s ease; }
+.btn-submit:hover { transform:scale(1.05); background:#e06d00; }
+.error { color:red; margin-top:10px; text-align:center; }
+.success { color:green; margin-top:10px; text-align:center; }
+footer { background:#1d4ed8; color:white; text-align:center; padding:20px; position:fixed; bottom:0; width:100%; }
+</style>
 
-  <style>
-    body { margin:0; font-family:"Inter",sans-serif; background:#f5f7fa; }
-    header { background:#dcdcdc; padding:18px 30px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 4px 12px rgba(0,0,0,0.1);}
-    header img { height:95px; animation:fadeDown 0.5s ease; }
-    @keyframes fadeDown { from {opacity:0; transform:translateY(-10px);} to {opacity:1; transform:translateY(0);} }
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 
-    .container { max-width:900px; margin:40px auto; padding:20px; }
-    .title { text-align:center; font-size:30px; font-weight:700; color:#1d4ed8; margin-bottom:15px; }
-    .subtitle { text-align:center; font-size:16px; color:#444; margin-bottom:30px; }
-    .card { background:white; padding:25px; border-radius:14px; box-shadow:0 6px 14px rgba(0,0,0,0.1); margin-bottom:30px; }
-    label { font-size:15px; font-weight:600; color:#333; display:block; margin-top:12px; }
-    input, textarea { width:100%; padding:12px; margin-top:6px; border:1px solid #ccc; border-radius:10px; font-size:15px; background:#f9f9f9; }
-    textarea { height:120px; resize:none; }
-    .btn-submit { width:100%; margin-top:20px; padding:14px; background:#ff7a00; color:white; border-radius:12px; font-size:17px; font-weight:700; cursor:pointer; border:none; transition:0.3s ease; }
-    .btn-submit:hover { transform:scale(1.05); background:#e06d00; }
-    .error { color:red; margin-top:10px; text-align:center; }
-    .success { color:green; margin-top:10px; text-align:center; }
-    footer { background:#1d4ed8; color:white; text-align:center; padding:20px; position:fixed; bottom:0; width:100%; }
-  </style>
+<script>
+const firebaseConfig = {
+apiKey: "AIzaSyDL_BRheLzGxDJ-6XbjitZw8HFmUzQwgaI",
+authDomain: "findero-39098.firebaseapp.com",
+projectId: "findero-39098",
+storageBucket: "findero-39098.appspot.com",
+messagingSenderId: "796711693094",
+appId: "1:796711693094:web:616efe1fd7291759d02fe7"
+};
+firebase.initializeApp(firebaseConfig);
+const auth=firebase.auth(),db=firebase.firestore(),storage=firebase.storage();
 
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+auth.onAuthStateChanged(user=>{if(!user) window.location.href="login.html";});
 
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyDL_BRheLzGxDJ-6XbjitZw8HFmUzQwgaI",
-      authDomain: "findero-39098.firebaseapp.com",
-      projectId: "findero-39098",
-      storageBucket: "findero-39098.appspot.com",
-      messagingSenderId: "796711693094",
-      appId: "1:796711693094:web:616efe1fd7291759d02fe7"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-    const storage = firebase.storage();
+function logout(){ auth.signOut().then(()=>window.location.href="login.html"); }
 
-    // Redirect if not logged in
-    auth.onAuthStateChanged((user) => {
-      if (!user) window.location.href = "login.html";
-    });
+function submitItem(){
+const name=document.getElementById("itemName").value.trim();
+const location=document.getElementById("locationFound").value.trim();
+const date=document.getElementById("dateFound").value;
+const desc=document.getElementById("description").value.trim();
+const image=document.getElementById("imageUpload").files[0];
+const errorMsg=document.getElementById("errorMsg");
+const successMsg=document.getElementById("successMsg");
+errorMsg.innerText=""; successMsg.innerText="";
+if(!name||!location||!date){ errorMsg.innerText="Please fill all required fields."; return; }
 
-    function submitItem() {
-      const itemName = document.getElementById("itemName").value;
-      const locationFound = document.getElementById("locationFound").value;
-      const dateFound = document.getElementById("dateFound").value;
-      const description = document.getElementById("description").value;
-      const imageFile = document.getElementById("imageUpload").files[0];
+let docRef = db.collection("foundItems").doc();
+let data = {itemName:name,locationFound:location,dateFound:date,description:desc,trackingId:docRef.id};
 
-      const errorMsg = document.getElementById("errorMsg");
-      const successMsg = document.getElementById("successMsg");
-      errorMsg.innerText = "";
-      successMsg.innerText = "";
-
-      if (!itemName || !locationFound || !dateFound) {
-        errorMsg.innerText = "Please fill in all required fields.";
-        return;
-      }
-
-      // Create a unique ID for the item
-      const itemId = db.collection("foundItems").doc().id;
-
-      // Function to save item after optional image upload
-      const saveItem = (imageUrl = "") => {
-        db.collection("foundItems").doc(itemId).set({
-          itemId,
-          itemName,
-          locationFound,
-          dateFound,
-          description,
-          imageUrl,
-          submittedBy: auth.currentUser.uid,
-          timestamp: firebase.firestore.FieldValue.serverTimestamp()
-        })
-        .then(() => {
-          successMsg.innerText = "Item submitted successfully!";
-          document.getElementById("itemName").value = "";
-          document.getElementById("locationFound").value = "";
-          document.getElementById("dateFound").value = "";
-          document.getElementById("description").value = "";
-          document.getElementById("imageUpload").value = "";
-        })
-        .catch((error) => { errorMsg.innerText = error.message; });
-      };
-
-      if (imageFile) {
-        const storageRef = storage.ref(`foundImages/${itemId}_${imageFile.name}`);
-        storageRef.put(imageFile)
-          .then(() => storageRef.getDownloadURL())
-          .then((url) => saveItem(url))
-          .catch((error) => { errorMsg.innerText = error.message; });
-      } else {
-        saveItem();
-      }
-    }
-  </script>
+if(image){
+let storageRef = storage.ref().child("foundItems/"+docRef.id+"/"+image.name);
+storageRef.put(image).then(snap=>snap.ref.getDownloadURL().then(url=>{data.imageUrl=url; docRef.set(data).then(()=>successMsg.innerText="Item submitted! Tracking ID: "+docRef.id);}));
+}else{ docRef.set(data).then(()=>successMsg.innerText="Item submitted! Tracking ID: "+docRef.id); }
+}
+</script>
 </head>
 <body>
+<header>
+<img src="assets/logo.png" alt="Findero Logo" />
+<button class="btn-submit" style="width:auto;" onclick="logout()">Logout</button>
+</header>
 
-  <header>
-    <img src="assets/logo.png" alt="Findero Logo" />
-    <button class="btn-submit" onclick="auth.signOut().then(()=>window.location.href='login.html')">Logout</button>
-  </header>
+<div class="container">
+<div class="title">Found an Item?</div>
+<div class="subtitle">Please share the item details so we can help reconnect it with the owner.</div>
 
-  <div class="container">
-    <div class="title">Found an Item?</div>
-    <div class="subtitle">Please share the item details to help reconnect it with the owner.</div>
+<div class="card">
+<label>Item Name</label>
+<input type="text" id="itemName" placeholder="Example: iPhone 13, Backpack, Keys" />
+<label>Location Found</label>
+<input type="text" id="locationFound" placeholder="Example: Library, School Gate, Bus Stop" />
+<label>Date Found</label>
+<input type="date" id="dateFound" />
+<label>Description</label>
+<textarea id="description" placeholder="Describe the item..."></textarea>
+<label>Upload Image (optional)</label>
+<input type="file" id="imageUpload" accept="image/*" />
+<button class="btn-submit" onclick="submitItem()">Submit Found Item</button>
+<div class="error" id="errorMsg"></div>
+<div class="success" id="successMsg"></div>
+</div>
+</div>
 
-    <div class="card">
-      <label>Item Name *</label>
-      <input type="text" id="itemName" placeholder="Example: iPhone 13, Backpack, Keys" />
-
-      <label>Location Found *</label>
-      <input type="text" id="locationFound" placeholder="Example: Library, School Gate, Bus Stop" />
-
-      <label>Date Found *</label>
-      <input type="date" id="dateFound" />
-
-      <label>Description</label>
-      <textarea id="description" placeholder="Describe the item..."></textarea>
-
-      <label>Upload Image (optional)</label>
-      <input type="file" id="imageUpload" accept="image/*" />
-
-      <button class="btn-submit" onclick="submitItem()">Submit Found Item</button>
-
-      <div class="error" id="errorMsg"></div>
-      <div class="success" id="successMsg"></div>
-    </div>
-  </div>
-
-  <footer>
-    &copy; 2025 Findero. All rights reserved.
-  </footer>
-
+<footer>&copy; 2025 Findero. All rights reserved.</footer>
 </body>
 </html>
