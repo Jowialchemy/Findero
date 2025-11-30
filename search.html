@@ -1,1 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Findero — Search Items</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
+<style>
+:root{
+  --brand:#1d4ed8;
+  --accent:#ff7a00;
+  --bg:#f5f7fa;
+  --card:#fff;
+}
+body{margin:0;font-family:"Inter",sans-serif;background:var(--bg);color:#111}
+header{background:#dcdcdc;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 4px 10px rgba(0,0,0,0.06)}
+header img{height:95px;animation:fadeDown .45s ease}
+@keyframes fadeDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+.container{max-width:1024px;margin:28px auto;padding:16px}
+.hero{display:flex;flex-direction:column;gap:10px;margin-bottom:18px}
+.title{font-size:26px;color:var(--brand);font-weight:700}
+.subtitle{color:#444}
+.search-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:8px}
+.search-input{flex:1;min-width:200px;padding:12px;border-radius:10px;border:1px solid #ccc;background:#fff;font-size:15px}
+.btn{padding:10px 14px;border-radius:10px;border:none;background:var(--accent);color:#fff;font-weight:700;cursor:pointer}
+.btn.secondary{background:var(--brand)}
+.results{margin-top:20px;display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
+.card{background:var(--card);padding:14px;border-radius:12px;box-shadow:0 6px 18px rgba(0,0,0,0.06);display:flex;flex-direction:column;gap:8px}
+.card .top{display:flex;gap:12px;align-items:flex-start}
+.thumb{width:84px;height:84px;border-radius:8px;object-fit:cover;background:#f0f0f0}
+.meta{flex:1}
+.meta .name{font-weight:700;color:#111}
+.meta .type{font-size:13px;color:#555}
+.meta .sub{font-size:13px;color:#444;margin-top:6px}
+.small{font-size:13px;color:#666}
+.no-results{margin-top:20px;text-align:center;color:#666}
+.error{color:#b00020;background:#fff6f6;padding:12px;border-radius:10px;border:1px solid #ffd6d6;text-align:center}
+footer{background:var(--brand);color:#fff;padding:14px;text-align:center;position:fixed;left:0;right:0;bottom:0}
+.logout{background:transparent;border:1px solid rgba(0,0,0,0.06);padding:8px 12px;border-radius:10px;cursor:pointer}
+@media (max-width:640px){ .title{font-size:20px} .thumb{width:72px;height:72px} .results{grid-template-columns:1fr} header{padding:12px} .container{padding:12px;margin:16px auto} }
+</style>
+
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+<script src="firebase.js"></script>
+
+<script>
+protectPage(); // redirect if not logged in
+
+let foundItemsCache = [];
+let lostItemsCache = [];
+
+// escape helper
+function esc(s){ if(s===null||s===undefined) return ""; return String(s); }
+
+// render a single card
+function renderCard(item, source){
+  const name = esc(item.itemName || item.itemName || "Unnamed item");
+  const location = esc(item.locationFound || item.lostLocation || "-");
+  const date = esc(item.dateFound || item.lostDate || "-");
+  const desc = esc(item.description || "");
+  const img = esc(item.imageUrl || "");
+  const tracking = esc(item.trackingId || "-");
+  const sourceLabel = source==='found'?'Found Item':'Lost Item';
+
+  return `
+    <div class="card" data-tracking="${tracking}">
+      <div class="top">
+        ${img?`<img class="thumb" src="${img}" alt="image">`:
+        `<div class="thumb" style="display:flex;align-items:center;justify-content:center;color:#888;font-size:13px">No Image</div>`}
+        <div class="meta">
+          <div class="name">${name}</div>
+          <div class="type small">${sourceLabel} • ID: ${tracking}</div>
+          <div class="sub">Location: ${location}</div>
+          <div class="small">Date: ${date}</div>
+        </div>
+      </div>
+      ${desc?`<div class="small" style="margin-top:8px">Description: ${desc}</div>`:''}
+    </div>
+  `;
+}
+
+// debounce helper
+function debounce(fn, delay=300){
+  let t;
+  return (...args)=>{ clearTimeout(t); t=setTimeout(()=>fn(...args), delay); };
+}
+
+// live search
+const doFilter = debounce(()=>{
+  const q = document.getElementById('searchInput').value.trim().toLowerCase();
+  const resultsEl = document.getElementById('results');
+  const statusEl = document.getElementById('status');
+  resultsEl.innerHTML = '';
+  statusEl.innerHTML = '';
+
+  if(!q){
+    statusEl.innerHTML='<div class="no-results">Type to search items (found + lost).</div>';
+    return;
+  }
+
+  const combined = [...foundItemsCache.map(i=>({...i,_source:'found'})), ...lostItemsCache.map(i=>({...i,_source:'lost'}))];
+  const matched = combined.filter(it=>{
+    const name = (it.itemName||'').toLowerCase();
+    const loc = (it.locationFound||it.lostLocation||'').toLowerCase();
+    const desc = (it.description||'').toLowerCase();
+    const date = (it.dateFound||it.lostDate||'').toLowerCase();
+    const tid = (it.trackingId||'').toLowerCase();
+    return name.includes(q)||loc.includes(q)||desc.includes(q)||date.includes(q)||tid.includes(q);
+  });
+
+  if(!matched.length){
+    statusEl.innerHTML='<div class="no-results">No items match your search.</div>';
+    return;
+  }
+
+  matched.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
+  resultsEl.innerHTML = matched.map(m=>renderCard(m,m._source)).join('');
+},220);
+
+// init listeners
+function initListeners(){
+  db.collection('foundItems').orderBy('timestamp','desc').onSnapshot(snap=>{
+    foundItemsCache = snap.docs.map(d=>({...d.data(),_id:d.id}));
+    if(document.getElementById('searchInput').value.trim()) doFilter();
+  });
+
+  db.collection('lostItems').orderBy('createdAt','desc').onSnapshot(snap=>{
+    lostItemsCache = snap.docs.map(d=>({...d.data(),_id:d.id}));
+    if(document.getElementById('searchInput').value.trim()) doFilter();
+  });
+}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  initListeners();
+  const input = document.getElementById('searchInput');
+  input.addEventListener('input',()=>doFilter());
+  input.addEventListener('keydown',(e)=>{ if(e.key==='Escape'){ input.value=''; doFilter(); }});
+});
+</script>
+</head>
+<body>
+<header>
+<img src="assets/logo.png" alt="Findero Logo">
+<button class="logout" onclick="logout()">Logout</button>
+</header>
+
+<main class="container">
+<div class="hero">
+  <div class="title">Search Items (Found + Lost)</div>
+  <div class="subtitle">Live search across both found and lost items — type a name, location, description, date, or tracking ID.</div>
+  <div class="search-row">
+    <input id="searchInput" class="search-input" type="search" placeholder="Start typing (e.g., 'iPhone', 'library', '2025-11-15', tracking id)">
+    <button class="btn secondary" onclick="document.getElementById('searchInput').value=''; doFilter();">Clear</button>
+  </div>
+</div>
+<div id="status" class="small"></div>
+<div id="results" class="results"></div>
+</main>
+
+<footer>&copy; 2025 Findero. All rights reserved.</footer>
+</body>
+</html>
