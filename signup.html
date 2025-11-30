@@ -20,13 +20,11 @@ input{width:100%;padding:12px;margin-top:6px;border:1px solid #ccc;border-radius
 footer{background:#1d4ed8;color:#fff;text-align:center;padding:14px;margin-top:30px;border-radius:0;}
 </style>
 
-<!-- Firebase SDKs -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 
 </head>
 <body>
-
 <header>
   <img src="assets/logo.png" alt="Findero Logo">
 </header>
@@ -50,7 +48,7 @@ footer{background:#1d4ed8;color:#fff;text-align:center;padding:14px;margin-top:3
 <footer>&copy; 2025 Findero. All rights reserved.</footer>
 
 <script>
-  // --- Firebase config ---
+document.addEventListener('DOMContentLoaded', () => {
   const firebaseConfig = {
     apiKey: "AIzaSyDL_BRheLzGxDJ-6XbjitZw8HFmUzQwgaI",
     authDomain: "findero-39098.firebaseapp.com",
@@ -60,12 +58,19 @@ footer{background:#1d4ed8;color:#fff;text-align:center;padding:14px;margin-top:3
     appId: "1:796711693094:web:616efe1fd7291759d02fe7"
   };
   firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth(); // ✅ auth defined
+  const auth = firebase.auth();
+
+  // Redirect if already logged in
+  auth.onAuthStateChanged(user => {
+    if(user){
+      window.location.href='dashboard.html';
+    }
+  });
 
   // Password visibility toggle
-  document.getElementById('togglePass').addEventListener('change', function(){
-    const pass = document.getElementById('password');
-    pass.type = this.checked ? 'text' : 'password';
+  const toggle = document.getElementById('togglePass');
+  toggle.addEventListener('change', () => {
+    document.getElementById('password').type = toggle.checked ? 'text' : 'password';
   });
 
   // Signup button
@@ -78,19 +83,12 @@ footer{background:#1d4ed8;color:#fff;text-align:center;padding:14px;margin-top:3
     }
     try {
       await auth.createUserWithEmailAndPassword(email, password);
-      window.location.href = "dashboard.html";
+      window.location.href='dashboard.html';
     } catch(err){
       alert("Signup failed: " + err.message);
     }
   });
-
-  // Redirect if already logged in
-  auth.onAuthStateChanged(user => {
-    if(user){
-      window.location.href = "dashboard.html";
-    }
-  });
+});
 </script>
-
 </body>
 </html>
