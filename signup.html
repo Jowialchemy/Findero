@@ -1,74 +1,111 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sign Up - Findero</title> 
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Findero - Signup</title>
 
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" /> 
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 
-  <style>
-    body { margin: 0; padding: 0; font-family: "Inter", sans-serif; background: #f5f7fa; } 
+  <style>
+    body { margin:0; font-family:"Inter",sans-serif; background:#f5f7fa; }
+    header { background:#dcdcdc; padding:18px 30px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 4px 12px rgba(0,0,0,0.1);}
+    header img { height:95px; animation:fadeDown 0.5s ease; }
+    @keyframes fadeDown { from {opacity:0; transform:translateY(-10px);} to {opacity:1; transform:translateY(0);} }
 
-    header {
-      background: #dcdcdc;
-      padding: 16px 28px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-    } 
+    .container { max-width:400px; margin:80px auto; background:white; padding:30px; border-radius:14px; box-shadow:0 6px 14px rgba(0,0,0,0.1); }
+    .title { font-size:28px; font-weight:700; color:#1d4ed8; text-align:center; margin-bottom:15px; }
+    input { width:100%; padding:12px; margin:10px 0; border-radius:10px; border:1px solid #ccc; font-size:15px; }
+    .btn-submit { width:100%; padding:14px; background:#ff7a00; color:white; border:none; border-radius:12px; font-size:17px; font-weight:700; cursor:pointer; transition:0.3s ease; }
+    .btn-submit:hover { background:#e06d00; transform:scale(1.05); }
+    .link { text-align:center; margin-top:15px; font-size:14px; }
+    .link a { color:#1d4ed8; text-decoration:none; }
+    .link a:hover { text-decoration:underline; }
+    footer { background:#1d4ed8; color:white; text-align:center; padding:20px; position:fixed; bottom:0; width:100%; }
+    .error { color:red; font-size:14px; margin-top:5px; text-align:center; }
+    .success { color:green; font-size:14px; margin-top:5px; text-align:center; }
+  </style>
 
-    header img { height: 95px; } 
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 
-    .container {
-      max-width: 420px;
-      background: white;
-      padding: 30px;
-      margin: 50px auto;
-      border-radius: 14px;
-      box-shadow: 0 6px 14px rgba(0,0,0,0.1);
-    } 
-
-    .title { font-size: 28px; font-weight: 700; color: #1d4ed8; text-align: center; } 
-
-    label { font-weight: 600; margin-top: 15px; display: block; }
-    input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #ccc; margin-top: 5px; background: #f9f9f9; } 
-
-    .btn-signup {
-      width: 100%; padding: 14px; background: #ff7a00;
-      color: white; border: none; border-radius: 12px;
-      font-size: 17px; font-weight: 700; cursor: pointer;
-      margin-top: 20px;
-    } 
-
-    .bottom { text-align: center; margin-top: 15px; }
-    .bottom a { color: #1d4ed8; font-weight: 600; text-decoration: none; } 
-
-  </style>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDL_BRheLzGxDJ-6XbjitZw8HFmUzQwgaI",
+      authDomain: "findero-39098.firebaseapp.com",
+      projectId: "findero-39098",
+      storageBucket: "findero-39098.appspot.com",
+      messagingSenderId: "796711693094",
+      appId: "1:796711693094:web:616efe1fd7291759d02fe7"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+  </script>
 </head>
-<body> 
+<body>
 
-<header>
-  <img src="logo.png" alt="Findero Logo">
-</header> 
+  <header>
+    <img src="assets/logo.png" alt="Findero Logo" />
+  </header>
 
-<div class="container">
-  <div class="title">Create Account</div> 
+  <div class="container">
+    <div class="title">Create an Account</div>
 
-  <label>Full Name</label>
-  <input type="text" placeholder="Enter your full name" /> 
+    <input type="email" id="email" placeholder="Email" required />
+    <input type="password" id="password" placeholder="Password" required />
+    <input type="password" id="confirmPassword" placeholder="Confirm Password" required />
+    <button class="btn-submit" onclick="signup()">Sign Up</button>
 
-  <label>Email</label>
-  <input type="email" placeholder="Enter your email" /> 
+    <div class="error" id="errorMsg"></div>
+    <div class="success" id="successMsg"></div>
 
-  <label>Password</label>
-  <input type="password" placeholder="Enter your password" /> 
+    <div class="link">
+      Already have an account? <a href="login.html">Login</a>
+    </div>
+  </div>
 
-  <button class="btn-signup" onclick="window.location.href='dashboard.html'">Sign Up</button> 
+  <footer>
+    &copy; 2025 Findero. All rights reserved.
+  </footer>
 
-  <div class="bottom">Already have an account? <a href="login.html">Login</a></div>
-</div> 
+  <script>
+    function signup() {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      const confirmPassword = document.getElementById("confirmPassword").value;
+      const errorMsg = document.getElementById("errorMsg");
+      const successMsg = document.getElementById("successMsg");
+
+      errorMsg.innerText = "";
+      successMsg.innerText = "";
+
+      if (password !== confirmPassword) {
+        errorMsg.innerText = "Passwords do not match!";
+        return;
+      }
+
+      auth.createUserWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+          const user = userCredential.user;
+          user.sendEmailVerification()
+            .then(() => {
+              successMsg.innerText = "Verification email sent. Please check your inbox.";
+              document.getElementById("email").value = "";
+              document.getElementById("password").value = "";
+              document.getElementById("confirmPassword").value = "";
+            })
+            .catch((error) => {
+              errorMsg.innerText = error.message;
+            });
+        })
+        .catch((error) => {
+          errorMsg.innerText = error.message;
+        });
+    }
+  </script>
 
 </body>
 </html>
