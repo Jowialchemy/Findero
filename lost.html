@@ -3,31 +3,30 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Findero - Signup</title>
+<title>Findero - Search Lost Items</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 <style>
 body { margin:0; font-family:"Inter",sans-serif; background:#f5f7fa; }
-header { background:#dcdcdc; padding:18px 30px; display:flex; justify-content:center; align-items:center; box-shadow:0 4px 12px rgba(0,0,0,0.1);}
+header { background:#dcdcdc; padding:18px 30px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 4px 12px rgba(0,0,0,0.1);}
 header img { height:95px; max-width:100%; animation:fadeDown 0.5s ease; }
 @keyframes fadeDown { from {opacity:0; transform:translateY(-10px);} to {opacity:1; transform:translateY(0);} }
 
-.container { max-width:400px; margin:80px auto; background:white; padding:30px; border-radius:14px; box-shadow:0 6px 14px rgba(0,0,0,0.1); }
-.title { font-size:28px; font-weight:700; color:#1d4ed8; text-align:center; margin-bottom:15px; }
-input { width:100%; padding:12px; margin:10px 0; border-radius:10px; border:1px solid #ccc; font-size:15px; }
-.btn-submit { width:100%; padding:14px; background:#ff7a00; color:white; border:none; border-radius:12px; font-size:17px; font-weight:700; cursor:pointer; transition:0.3s ease; }
-.btn-submit:hover { background:#e06d00; transform:scale(1.05); }
-.link { text-align:center; margin-top:15px; font-size:14px; }
-.link a { color:#1d4ed8; text-decoration:none; }
-.link a:hover { text-decoration:underline; }
-.error { color:red; font-size:14px; margin-top:5px; text-align:center; }
-.success { color:green; font-size:14px; margin-top:5px; text-align:center; }
-.password-container { position:relative; }
-.toggle-password { position:absolute; right:12px; top:12px; cursor:pointer; font-size:18px; }
+.container { max-width:900px; margin:40px auto; padding:20px; }
+.title { text-align:center; font-size:30px; font-weight:700; color:#1d4ed8; margin-bottom:15px; }
+.subtitle { text-align:center; font-size:16px; color:#444; margin-bottom:30px; }
+input { width:100%; padding:12px; margin:10px 0; border-radius:10px; border:1px solid #ccc; font-size:15px; background:#f9f9f9; }
+.btn-submit { width:100%; margin-top:10px; padding:14px; background:#ff7a00; color:white; border-radius:12px; font-size:17px; font-weight:700; cursor:pointer; border:none; transition:0.3s ease; }
+.btn-submit:hover { transform:scale(1.05); background:#e06d00; }
+.results { margin-top:20px; }
+.card { background:white; padding:15px; border-radius:12px; box-shadow:0 4px 10px rgba(0,0,0,0.08); margin-bottom:15px; }
 footer { background:#1d4ed8; color:white; text-align:center; padding:20px; position:fixed; bottom:0; width:100%; }
+.error { color:red; margin-top:10px; text-align:center; }
 </style>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
 <script>
 const firebaseConfig = {
 apiKey: "AIzaSyDL_BRheLzGxDJ-6XbjitZw8HFmUzQwgaI",
@@ -38,58 +37,45 @@ messagingSenderId: "796711693094",
 appId: "1:796711693094:web:616efe1fd7291759d02fe7"
 };
 firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
+const auth=firebase.auth(), db=firebase.firestore();
 
-auth.onAuthStateChanged(user => { if(user) window.location.href="dashboard.html"; });
+auth.onAuthStateChanged(user=>{if(!user) window.location.href="login.html";});
+function logout(){ auth.signOut().then(()=>window.location.href="login.html"); }
 
-function signup() {
-const email=document.getElementById("email").value;
-const password=document.getElementById("password").value;
-const confirm=document.getElementById("confirmPassword").value;
-const errorMsg=document.getElementById("errorMsg");
-const successMsg=document.getElementById("successMsg");
-errorMsg.innerText=""; successMsg.innerText="";
-if(!email||!password||!confirm){errorMsg.innerText="Fill all fields."; return;}
-if(password!==confirm){errorMsg.innerText="Passwords do not match."; return;}
-auth.createUserWithEmailAndPassword(email,password)
-.then(() => {successMsg.innerText="Account created! Redirecting..."; setTimeout(()=>window.location.href="dashboard.html",1500);})
-.catch(err=>errorMsg.innerText=err.message);
+function searchItems(){
+const keyword=document.getElementById("searchInput").value.trim().toLowerCase();
+const resultsDiv=document.getElementById("results");
+resultsDiv.innerHTML="";
+if(!keyword){ resultsDiv.innerHTML='<div class="error">Please enter a keyword.</div>'; return; }
+
+db.collection("foundItems").get().then(snapshot=>{
+let found=false;
+snapshot.forEach(doc=>{
+let data=doc.data();
+if((data.itemName && data.itemName.toLowerCase().includes(keyword)) || (data.description && data.description.toLowerCase().includes(keyword))){
+found=true;
+let html=`<div class="card"><strong>${data.itemName}</strong><br>Location: ${data.locationFound}<br>Date: ${data.dateFound}<br>${data.description ? "Desc: "+data.description : ""}`;
+if(data.imageUrl) html+=`<br><img src="${data.imageUrl}" style="max-width:100px; margin-top:5px;" />`;
+html+="</div>";
+resultsDiv.innerHTML+=html;
 }
-
-function togglePassword(){
-const pwd=document.getElementById("password");
-pwd.type = pwd.type==="password"?"text":"password";
-}
-function toggleConfirmPassword(){
-const pwd=document.getElementById("confirmPassword");
-pwd.type = pwd.type==="password"?"text":"password";
+});
+if(!found) resultsDiv.innerHTML='<div class="error">No items found.</div>';
+}).catch(err=>resultsDiv.innerHTML='<div class="error">'+err.message+'</div>');
 }
 </script>
 </head>
 <body>
-
-<header><img src="assets/logo.png" alt="Findero Logo" /></header>
+<header>
+<img src="assets/logo.png" alt="Findero Logo" />
+<button class="btn-submit" style="width:auto;" onclick="logout()">Logout</button>
+</header>
 
 <div class="container">
-<div class="title">Sign Up</div>
-
-<input type="email" id="email" placeholder="Email" required />
-
-<div class="password-container">
-<input type="password" id="password" placeholder="Password" required />
-<span class="toggle-password" onclick="togglePassword()">👁️</span>
-</div>
-
-<div class="password-container">
-<input type="password" id="confirmPassword" placeholder="Confirm Password" required />
-<span class="toggle-password" onclick="toggleConfirmPassword()">👁️</span>
-</div>
-
-<button class="btn-submit" onclick="signup()">Sign Up</button>
-<div class="error" id="errorMsg"></div>
-<div class="success" id="successMsg"></div>
-
-<div class="link">Already have an account? <a href="login.html">Login</a></div>
+<div class="title">Search Lost Items</div>
+<input type="text" id="searchInput" placeholder="Enter item name or description" />
+<button class="btn-submit" onclick="searchItems()">Search</button>
+<div id="results" class="results"></div>
 </div>
 
 <footer>&copy; 2025 Findero. All rights reserved.</footer>
