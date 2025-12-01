@@ -1,66 +1,143 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Findero — Dashboard</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard - Findero</title>
 
-<style>
-body{margin:0;font-family:"Inter",sans-serif;background:#f5f7fa;color:#111}
-header{background:#dcdcdc;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 4px 10px rgba(0,0,0,0.06)}
-header img{height:95px;animation:fadeDown .45s ease}
-@keyframes fadeDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
-.container{max-width:900px;margin:36px auto;padding:20px}
-h1{color:#1d4ed8;font-size:28px;margin-bottom:20px;text-align:center}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;margin-top:20px}
-.card{background:#fff;padding:20px;border-radius:12px;box-shadow:0 6px 18px rgba(0,0,0,0.06);text-align:center}
-.card button{margin-top:12px;padding:10px 14px;background:#ff7a00;color:#fff;border:none;border-radius:10px;font-weight:700;cursor:pointer;transition:.2s}
-.card button:hover{background:#e06d00;transform:scale(1.05)}
-footer{background:#1d4ed8;color:#fff;text-align:center;padding:14px;position:fixed;left:0;right:0;bottom:0}
-.logout{background:#1d4ed8;color:#fff;border:0;padding:10px 14px;border-radius:10px;cursor:pointer}
-@media(max-width:640px){.grid{grid-template-columns:1fr}}
-</style>
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="firebase.js"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: "Inter", sans-serif;
+      background: #f5f7fa;
+    }
 
-<script>
-auth.onAuthStateChanged(user=>{
-    if(!user) window.location.href='login.html';
-});
-function logout(){ auth.signOut().then(()=>window.location.href='login.html'); }
-</script>
+    /* Header */
+    header {
+      background: #dcdcdc;
+      padding: 16px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    }
+
+    header img {
+      height: 95px;
+      animation: fadeDown 0.5s ease;
+    }
+
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .btn-logout {
+      background: #ff7a00;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      transition: 0.3s ease;
+    }
+
+    .btn-logout:hover {
+      transform: scale(1.05);
+      background: #e06d00;
+    }
+
+    /* Container */
+    .container {
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .title {
+      font-size: 32px;
+      font-weight: 700;
+      color: #1d4ed8;
+      animation: fadeIn 0.6s ease;
+    }
+
+    .subtitle {
+      font-size: 16px;
+      color: #444;
+      margin-top: 10px;
+      margin-bottom: 35px;
+    }
+
+    .dash-btn {
+      width: 100%;
+      max-width: 350px;
+      padding: 15px;
+      margin: 12px auto;
+      display: block;
+      border-radius: 12px;
+      border: none;
+      font-size: 17px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.3s;
+      color: white;
+    }
+
+    .btn-found {
+      background: #1d4ed8;
+    }
+
+    .btn-found:hover {
+      transform: scale(1.05);
+      background: #153ea8;
+    }
+
+    .btn-lost {
+      background: #ff7a00;
+    }
+
+    .btn-lost:hover {
+      transform: scale(1.05);
+      background: #e06d00;
+    }
+
+  </style>
 </head>
+
 <body>
-<header>
-<img src="assets/logo.png" alt="Findero Logo">
-<button class="logout" onclick="logout()">Logout</button>
-</header>
 
-<main class="container">
-<h1>Dashboard</h1>
-<div class="grid">
-  <div class="card">
-    <div>Submit Lost Item</div>
-    <button onclick="window.location.href='lost.html'">Go</button>
-  </div>
-  <div class="card">
-    <div>Submit Found Item</div>
-    <button onclick="window.location.href='found.html'">Go</button>
-  </div>
-  <div class="card">
-    <div>Search Items</div>
-    <button onclick="window.location.href='search.html'">Go</button>
-  </div>
-  <div class="card">
-    <div>Track Item</div>
-    <button onclick="window.location.href='track.html'">Go</button>
-  </div>
-</div>
-</main>
+  <!-- Header -->
+  <header>
+    <img src="logo.png" alt="Findero Logo" />
+    <button class="btn-logout" onclick="logout()">Logout</button>
+  </header>
 
-<footer>&copy; 2025 Findero. All rights reserved.</footer>
+  <!-- Dashboard Content -->
+  <div class="container">
+    <div class="title">Welcome to Findero</div>
+    <div class="subtitle">What would you like to do today?</div>
+
+    <!-- Buttons -->
+    <button class="dash-btn btn-found" onclick="window.location.href='found.html'">
+      I Found an Item
+    </button>
+
+    <button class="dash-btn btn-lost" onclick="window.location.href='lost.html'">
+      I Lost an Item
+    </button>
+  </div>
+
+  <script>
+    function logout() {
+      window.location.href = "login.html";
+    }
+  </script>
+
 </body>
 </html>
