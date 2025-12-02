@@ -1,154 +1,52 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Report Lost Item - Findero</title>
-    <link rel="stylesheet" href="assets/styles.css" />
-    <style>
-        body {
-            background: #f4f6f8;
-            margin: 0;
-            font-family: Arial, sans-serif;
-        }
-        .container {
-            max-width: 450px;
-            margin: 40px auto;
-            background: #fff;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-        h2 {
-            text-align: center;
-            margin-bottom: 20px;
-            color: #222;
-        }
-        label {
-            font-weight: bold;
-            display: block;
-            margin: 10px 0 5px;
-        }
-        input, textarea, select {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #bbb;
-            border-radius: 8px;
-            margin-bottom: 15px;
-        }
-        button {
-            width: 100%;
-            background: #ff7a00;
-            color: #fff;
-            padding: 12px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-        button:hover {
-            background: #e06700;
-        }
-        .success-box {
-            display: none;
-            padding: 20px;
-            background: #fff4e0;
-            border: 1px solid #ffd096;
-            border-radius: 8px;
-            margin-top: 15px;
-        }
-        .track-id {
-            font-weight: bold;
-            margin-top: 10px;
-            color: #cc6600;
-            text-align: center;
-        }
-    </style>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Findero — Report Lost</title>
+<link rel="stylesheet" href="assets/styles.css">
 </head>
 <body>
+<header>
+  <img src="assets/logo.png" alt="Findero Logo">
+  <div><button id="btnLogout" class="btn ghost">Logout</button></div>
+</header>
 
-<div class="container">
-    <h2>Report Lost Item</h2>
+<main class="container card">
+  <div class="title">Lost an item?</div>
+  <div class="small">Tell us what you lost so others can help find it.</div>
 
-    <form id="lostForm">
-        <label>Item Name</label>
-        <input type="text" id="itemName" required />
+  <form id="lostForm" style="margin-top:12px">
+    <label>Item name</label>
+    <input id="lostName" class="form-control" type="text" placeholder="e.g., Wallet">
 
-        <label>Description</label>
-        <textarea id="description" rows="3" required></textarea>
+    <label>Location lost</label>
+    <input id="lostLocation" class="form-control" type="text" placeholder="e.g., Bus stop">
 
-        <label>Location Last Seen</label>
-        <input type="text" id="location" required />
+    <label>Date lost</label>
+    <input id="lostDate" class="form-control" type="date">
 
-        <label>Date Lost</label>
-        <input type="date" id="dateLost" required />
+    <label>Description</label>
+    <textarea id="lostDesc" class="form-control" placeholder="Details..."></textarea>
 
-        <label>Upload Item Image</label>
-        <input type="file" id="itemImage" accept="image/*" required />
+    <label>Image (optional)</label>
+    <input id="lostImage" class="form-control" type="file" accept="image/*">
 
-        <button type="submit">Save & Generate Track ID</button>
-    </form>
-
-    <div class="success-box" id="successBox">
-        <p>Lost item reported successfully!</p>
-        <p class="track-id">Your Track ID: <span id="trackIdText"></span></p>
+    <div id="lostError" class="error" style="display:none"></div>
+    <div style="margin-top:12px">
+      <button class="btn" type="submit">Submit</button>
     </div>
-</div>
+  </form>
+</main>
+
+<div class="footer">© 2025 Findero. All rights reserved.</div>
 
 <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
-
-    // ✔ Your real Firebase config goes here
-    const firebaseConfig = {
-        apiKey: "YOUR_API_KEY",
-        authDomain: "YOUR_AUTH_DOMAIN",
-        projectId: "YOUR_PROJECT_ID",
-        storageBucket: "YOUR_STORAGE_BUCKET",
-        messagingSenderId: "YOUR_SENDER_ID",
-        appId: "YOUR_APP_ID"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const storage = getStorage(app);
-
-    const lostForm = document.getElementById("lostForm");
-    const successBox = document.getElementById("successBox");
-
-    lostForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
-
-        try {
-            const name = document.getElementById("itemName").value;
-            const desc = document.getElementById("description").value;
-            const loc = document.getElementById("location").value;
-            const date = document.getElementById("dateLost").value;
-            const image = document.getElementById("itemImage").files[0];
-
-            const imageRef = ref(storage, `lost_items/${Date.now()}_${image.name}`);
-            await uploadBytes(imageRef, image);
-            const imageURL = await getDownloadURL(imageRef);
-
-            const docRef = await addDoc(collection(db, "lost_items"), {
-                name,
-                desc,
-                loc,
-                date,
-                imageURL,
-                createdAt: new Date().toISOString()
-            });
-
-            document.getElementById("trackIdText").innerText = docRef.id;
-
-            successBox.style.display = "block";
-            lostForm.reset();
-        } catch (error) {
-            alert("Error saving lost item: " + error.message);
-        }
-    });
+  import { initLostPage } from './scripts/items.js';
+  import { initLogoutButton } from './scripts/auth.js';
+  initLogoutButton();
+  initLostPage();
+  document.getElementById('lostForm').addEventListener('submit', ()=>{ document.getElementById('lostError').style.display='block'; });
 </script>
-
 </body>
 </html>
