@@ -1,56 +1,32 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Findero — Home</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
-<style>
-:root{--brand:#1d4ed8;--accent:#ff7a00;--bg:#f5f7fa;--card:#fff;}
-*{box-sizing:border-box}
-body{margin:0;font-family:"Inter",sans-serif;background:var(--bg);color:#111}
-header{background:#dcdcdc;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 4px 10px rgba(0,0,0,0.06)}
-header img{height:95px;animation:fadeDown .45s ease;}
-@keyframes fadeDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
-main.container{max-width:900px;margin:36px auto;padding:20px;text-align:center}
-h1{color:var(--brand);font-size:28px;margin-bottom:8px}
-p{color:#444;margin-bottom:24px}
-.btn{display:inline-block;margin:6px;padding:12px 18px;background:var(--accent);color:#fff;border-radius:10px;border:none;font-weight:700;cursor:pointer;transition:.2s}
-.btn:hover{transform:scale(1.05);background:#e06d00}
-footer{background:var(--brand);color:#fff;text-align:center;padding:14px;position:fixed;left:0;right:0;bottom:0}
-@media(max-width:640px){h1{font-size:22px}main.container{padding:12px;margin:16px auto}}
-</style>
-
-<!-- Firebase SDKs -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
-
-<script src="firebase.js"></script>
-
-<script>
-auth.onAuthStateChanged(user => {
-    if(user){
-        // redirect logged-in users to dashboard
-        window.location.href="dashboard.html";
-    }
-});
-</script>
+<link rel="stylesheet" href="assets/styles.css">
 </head>
 <body>
 <header>
-<img src="assets/logo.png" alt="Findero Logo">
+  <img src="assets/logo.png" alt="Findero Logo">
+  <div style="display:flex;gap:8px;align-items:center">
+    <a class="btn ghost" href="login.html">Login</a>
+    <a class="btn secondary" href="signup.html">Sign Up</a>
+  </div>
 </header>
 
 <main class="container">
-<h1>Welcome to Findero</h1>
-<p>Lost or found an item? Use Findero to reconnect with the owner or recover your item.</p>
-<button class="btn" onclick="window.location.href='signup.html'">Sign Up</button>
-<button class="btn" onclick="window.location.href='login.html'">Login</button>
+  <div class="title">Welcome to Findero</div>
+  <div class="subtitle">Report lost or found items, search the database, or track by ID.</div>
+
+  <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:12px">
+    <a class="btn" href="found.html">Report Found Item</a>
+    <a class="btn" href="lost.html">Report Lost Item</a>
+    <a class="btn secondary" href="search.html">Search Items</a>
+    <a class="btn secondary" href="track.html">Track Item</a>
+  </div>
 </main>
 
-<footer>&copy; 2025 Findero. All rights reserved.</footer>
+<div class="footer">© 2025 Findero. All rights reserved.</div>
 </body>
 </html>
