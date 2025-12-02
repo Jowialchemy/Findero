@@ -1,53 +1,93 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Findero — Submit Found</title>
-<link rel="stylesheet" href="assets/styles.css">
-</head>
-<body>
-<header>
-  <img src="assets/logo.png" alt="Findero Logo">
-  <div><button id="btnLogout" class="btn ghost">Logout</button></div>
-</header>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Findero — Found Item</title>
 
-<main class="container card">
-  <div class="title">Found an item?</div>
-  <div class="small">Share details so we can reconnect with the owner.</div>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 
-  <form id="foundForm" style="margin-top:12px">
-    <label>Item name</label>
-    <input id="itemName" class="form-control" type="text" placeholder="e.g., iPhone 13">
+  <style>
+    :root {
+      --brand:#1d4ed8;
+      --accent:#ff7a00;
+      --bg:#f5f7fa;
+      --card:#ffffff;
+    }
+    body { margin:0; font-family:"Inter", sans-serif; background:var(--bg); }
 
-    <label>Location found</label>
-    <input id="locationFound" class="form-control" type="text" placeholder="e.g., Library">
+    header {
+      background:#dcdcdc;
+      padding:14px 18px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      box-shadow:0 4px 10px rgba(0,0,0,0.06);
+    }
+    header img { height:95px; }
 
-    <label>Date found</label>
-    <input id="dateFound" class="form-control" type="date">
+    .container {
+      max-width:600px;
+      margin:20px auto;
+      background:var(--card);
+      padding:20px;
+      border-radius:14px;
+      box-shadow:0 6px 20px rgba(0,0,0,0.07);
+    }
 
-    <label>Description</label>
-    <textarea id="description" class="form-control" placeholder="Details..."></textarea>
+    h2 { color:var(--brand); margin-bottom:5px; }
+    p { color:#555; margin-top:0; }
 
-    <label>Image (optional)</label>
-    <input id="imageUpload" class="form-control" type="file" accept="image/*">
+    input, textarea, select {
+      width:100%;
+      padding:12px;
+      margin-top:8px;
+      margin-bottom:14px;
+      border:1px solid #ccc;
+      border-radius:10px;
+      font-size:15px;
+    }
 
-    <div id="foundError" class="error" style="display:none"></div>
-    <div style="margin-top:12px">
-      <button class="btn" type="submit">Submit</button>
-    </div>
-  </form>
-</main>
+    button {
+      width:100%;
+      padding:12px;
+      background:var(--accent);
+      border:none;
+      border-radius:10px;
+      color:#fff;
+      font-size:16px;
+      font-weight:600;
+      cursor:pointer;
+    }
 
-<div class="footer">© 2025 Findero. All rights reserved.</div>
+    button:disabled {
+      opacity:0.6;
+      cursor:not-allowed;
+    }
 
-<script type="module">
-  import { initFoundPage } from './scripts/items.js';
-  import { initLogoutButton } from './scripts/auth.js';
-  initLogoutButton();
-  initFoundPage();
-  // show/hide error container correctly
-  document.getElementById('foundForm').addEventListener('submit', ()=>{ document.getElementById('foundError').style.display='block'; });
-</script>
-</body>
-</html>
+    footer {
+      background:var(--brand);
+      color:#fff;
+      text-align:center;
+      padding:14px;
+      margin-top:30px;
+    }
+
+    .logout {
+      background:transparent;
+      border:1px solid rgba(0,0,0,0.2);
+      padding:8px 12px;
+      border-radius:10px;
+      cursor:pointer;
+    }
+
+    #message {
+      margin-top:12px;
+      font-weight:600;
+      color:green;
+      text-align:center;
+    }
+
+    #error {
+      margin-top:12px;
+      font-weight
