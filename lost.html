@@ -1,182 +1,154 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Report Lost Item - Findero</title>
-<link rel="stylesheet" href="assets/styles.css" />
-
-<!-- Firebase -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import {
-    getFirestore,
-    collection,
-    addDoc,
-    serverTimestamp
-  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-  import {
-    getStorage,
-    ref,
-    uploadBytes,
-    getDownloadURL
-  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
-  import {
-    getAuth,
-    onAuthStateChanged,
-    signOut
-  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-
-  /** 🔥 INSERT YOUR FIREBASE CONFIG BELOW */
-  const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_AUTH_DOMAIN",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_STORAGE_BUCKET",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-  const storage = getStorage(app);
-  const auth = getAuth(app);
-
-  // 🔐 Redirect if not logged in
-  onAuthStateChanged(auth, (user) => {
-    if (!user) {
-      window.location.href = "login.html";
-    }
-  });
-
-  // 🔓 Logout
-  window.logoutUser = function () {
-    signOut(auth).then(() => (window.location.href = "login.html"));
-  };
-
-  // 📝 Submit Lost Item
-  window.submitLostItem = async function () {
-    const itemName = document.getElementById("itemName").value.trim();
-    const lastSeen = document.getElementById("lastSeen").value.trim();
-    const dateLost = document.getElementById("dateLost").value;
-    const description = document.getElementById("description").value.trim();
-    const fileInput = document.getElementById("imageFile").files[0];
-
-    if (!itemName || !lastSeen || !dateLost || !description) {
-      alert("Please fill all required fields.");
-      return;
-    }
-
-    document.getElementById("submitBtn").disabled = true;
-    document.getElementById("submitBtn").innerText = "Saving...";
-
-    try {
-      let imageUrl = "";
-
-      if (fileInput) {
-        const fileRef = ref(storage, `lost/${Date.now()}_${fileInput.name}`);
-        const snapshot = await uploadBytes(fileRef, fileInput);
-        imageUrl = await getDownloadURL(snapshot.ref);
-      }
-
-      const trackId = "TRK" + Math.floor(100000 + Math.random() * 900000);
-
-      await addDoc(collection(db, "lost_items"), {
-        itemName,
-        lastSeen,
-        dateLost,
-        description,
-        imageUrl,
-        trackId,
-        createdAt: serverTimestamp()
-      });
-
-      document.getElementById("successBox").style.display = "block";
-      document.getElementById("trackCode").innerText = trackId;
-
-      document.getElementById("lostForm").reset();
-    } catch (error) {
-      console.error("Error submitting form:", error);
-      alert("Something went wrong. Check console.");
-    }
-
-    document.getElementById("submitBtn").disabled = false;
-    document.getElementById("submitBtn").innerText = "Submit";
-  };
-</script>
-
-<style>
-  .container {
-    max-width: 600px;
-    margin: auto;
-    background: white;
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-  }
-  .logo {
-    width: 95px;
-    margin: 15px auto;
-    display: block;
-  }
-  .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 20px;
-  }
-  .success-box {
-    display: none;
-    background: #e0ffe6;
-    padding: 15px;
-    border-left: 5px solid green;
-    margin-bottom: 15px;
-    border-radius: 8px;
-  }
-</style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Report Lost Item - Findero</title>
+    <link rel="stylesheet" href="assets/styles.css" />
+    <style>
+        body {
+            background: #f4f6f8;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            max-width: 450px;
+            margin: 40px auto;
+            background: #fff;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #222;
+        }
+        label {
+            font-weight: bold;
+            display: block;
+            margin: 10px 0 5px;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #bbb;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        button {
+            width: 100%;
+            background: #ff7a00;
+            color: #fff;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #e06700;
+        }
+        .success-box {
+            display: none;
+            padding: 20px;
+            background: #fff4e0;
+            border: 1px solid #ffd096;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+        .track-id {
+            font-weight: bold;
+            margin-top: 10px;
+            color: #cc6600;
+            text-align: center;
+        }
+    </style>
 </head>
-
 <body>
 
-<!-- HEADER -->
-<header class="header">
-  <img src="assets/logo.png" alt="Findero" class="logo" />
-  <button onclick="logoutUser()" class="logout-btn">Logout</button>
-</header>
-
 <div class="container">
-  <h2>Lost an item?</h2>
-  <p>Share details so Findero can help locate your lost property.</p>
+    <h2>Report Lost Item</h2>
 
-  <div id="successBox" class="success-box">
-    <strong>Success!</strong> Your lost item has been reported.<br>
-    Your tracking ID is: <span id="trackCode" style="font-weight:bold;"></span>
-  </div>
+    <form id="lostForm">
+        <label>Item Name</label>
+        <input type="text" id="itemName" required />
 
-  <form id="lostForm" onsubmit="event.preventDefault(); submitLostItem();">
+        <label>Description</label>
+        <textarea id="description" rows="3" required></textarea>
 
-    <label>Item Name</label>
-    <input type="text" id="itemName" required />
+        <label>Location Last Seen</label>
+        <input type="text" id="location" required />
 
-    <label>Last Seen Location</label>
-    <input type="text" id="lastSeen" required />
+        <label>Date Lost</label>
+        <input type="date" id="dateLost" required />
 
-    <label>Date Lost</label>
-    <input type="date" id="dateLost" required />
+        <label>Upload Item Image</label>
+        <input type="file" id="itemImage" accept="image/*" required />
 
-    <label>Description</label>
-    <textarea id="description" required></textarea>
+        <button type="submit">Save & Generate Track ID</button>
+    </form>
 
-    <label>Image (optional)</label>
-    <input type="file" id="imageFile" accept="image/*" />
-
-    <button id="submitBtn" type="submit" class="submit-btn">Submit</button>
-  </form>
+    <div class="success-box" id="successBox">
+        <p>Lost item reported successfully!</p>
+        <p class="track-id">Your Track ID: <span id="trackIdText"></span></p>
+    </div>
 </div>
 
-<footer>
-  <p>© 2025 Findero. All rights reserved.</p>
-</footer>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+
+    // ✔ Your real Firebase config goes here
+    const firebaseConfig = {
+        apiKey: "YOUR_API_KEY",
+        authDomain: "YOUR_AUTH_DOMAIN",
+        projectId: "YOUR_PROJECT_ID",
+        storageBucket: "YOUR_STORAGE_BUCKET",
+        messagingSenderId: "YOUR_SENDER_ID",
+        appId: "YOUR_APP_ID"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
+
+    const lostForm = document.getElementById("lostForm");
+    const successBox = document.getElementById("successBox");
+
+    lostForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        try {
+            const name = document.getElementById("itemName").value;
+            const desc = document.getElementById("description").value;
+            const loc = document.getElementById("location").value;
+            const date = document.getElementById("dateLost").value;
+            const image = document.getElementById("itemImage").files[0];
+
+            const imageRef = ref(storage, `lost_items/${Date.now()}_${image.name}`);
+            await uploadBytes(imageRef, image);
+            const imageURL = await getDownloadURL(imageRef);
+
+            const docRef = await addDoc(collection(db, "lost_items"), {
+                name,
+                desc,
+                loc,
+                date,
+                imageURL,
+                createdAt: new Date().toISOString()
+            });
+
+            document.getElementById("trackIdText").innerText = docRef.id;
+
+            successBox.style.display = "block";
+            lostForm.reset();
+        } catch (error) {
+            alert("Error saving lost item: " + error.message);
+        }
+    });
+</script>
 
 </body>
 </html>
