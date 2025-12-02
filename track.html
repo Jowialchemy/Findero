@@ -1,98 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Findero — Track Item</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
-<style>
-body{margin:0;font-family:"Inter",sans-serif;background:#f5f7fa;color:#111}
-header{background:#dcdcdc;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 4px 10px rgba(0,0,0,0.06)}
-header img{height:95px;animation:fadeDown .45s ease}
-@keyframes fadeDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
-.container{max-width:720px;margin:36px auto;padding:20px}
-.title{text-align:center;color:#1d4ed8;font-size:28px;font-weight:700;margin-bottom:10px}
-.subtitle{text-align:center;color:#444;margin-bottom:20px}
-input[type="text"]{width:100%;padding:12px;border-radius:10px;border:1px solid #ccc;background:#fff;font-size:15px}
-.btn{display:inline-block;margin-top:12px;padding:12px 18px;background:#ff7a00;color:#fff;border-radius:10px;font-weight:700;border:none;cursor:pointer;transition:.18s}
-.btn:hover{transform:scale(1.02);background:#e06d00}
-.result,.error{margin-top:18px;padding:16px;border-radius:12px}
-.result{background:#fff;box-shadow:0 6px 14px rgba(0,0,0,0.06)}
-.error{background:#fff6f6;border:1px solid #ffd6d6;color:#b00020;text-align:center}
-img.item-img{max-width:220px;border-radius:8px;margin-top:10px;display:block}
-footer{background:#1d4ed8;color:#fff;text-align:center;padding:14px;position:fixed;bottom:0;left:0;right:0}
-.logout{background:#1d4ed8;color:#fff;border:0;padding:10px 14px;border-radius:10px;cursor:pointer}
-</style>
-
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
-<script src="firebase.js"></script>
-
-<script>
-auth.onAuthStateChanged(user=>{
-    if(!user) window.location.href='login.html';
-});
-
-function logout(){ auth.signOut().then(()=>window.location.href='login.html'); }
-
-async function trackItem(){
-    const id=document.getElementById('trackingId').value.trim();
-    const out=document.getElementById('output');
-    out.innerHTML='';
-    if(!id){ out.innerHTML='<div class="error">Please enter a tracking ID.</div>'; return; }
-
-    try{
-        const foundDoc=await db.collection('foundItems').doc(id).get();
-        if(foundDoc.exists){ out.innerHTML=renderItemCard(foundDoc.data(),'Found Item'); return; }
-
-        const lostDoc=await db.collection('lostItems').doc(id).get();
-        if(lostDoc.exists){ out.innerHTML=renderItemCard(lostDoc.data(),'Lost Item'); return; }
-
-        out.innerHTML=`<div class="error">No item found with Tracking ID <strong>${id}</strong>.</div>`;
-    }catch(err){
-        out.innerHTML=`<div class="error">${err.message}</div>`;
-    }
-}
-
-function renderItemCard(item,label){
-    const name=item.itemName||item.itemName||"Unnamed item";
-    const location=item.locationFound||item.lostLocation||"-";
-    const date=item.dateFound||item.lostDate||"-";
-    const desc=item.description||"-";
-    const img=item.imageUrl||"";
-    const tracking=item.trackingId||"-";
-    return `
-        <div class="result">
-            <div style="font-weight:700;font-size:18px;margin-bottom:6px;">${name}</div>
-            <div style="color:#555">Type: ${label}</div>
-            <div style="margin-top:8px">Location: <strong>${location}</strong></div>
-            <div>Date: <strong>${date}</strong></div>
-            <div style="margin-top:8px">Description: ${desc}</div>
-            ${img?`<img class="item-img" src="${img}" alt="item image">`:''}
-            <div style="margin-top:10px;color:#111">Tracking ID: <strong>${tracking}</strong></div>
-        </div>
-    `;
-}
-</script>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Findero — Track</title>
+<link rel="stylesheet" href="assets/styles.css">
 </head>
 <body>
 <header>
-<img src="assets/logo.png" alt="Findero Logo">
-<button class="logout" onclick="logout()">Logout</button>
+  <img src="assets/logo.png" alt="Findero Logo">
+  <div><button id="btnLogout" class="btn ghost">Logout</button></div>
 </header>
 
 <main class="container">
-<div class="title">Track an Item</div>
-<div class="subtitle">Enter the tracking ID provided when the item was submitted.</div>
+  <div class="title">Track an Item</div>
+  <div class="small">Enter the tracking ID provided when the item was submitted</div>
 
-<input type="text" id="trackingId" placeholder="Tracking ID (example: AbCd123)">
-<div style="text-align:center"><button class="btn" onclick="trackItem()">Track</button></div>
-<div id="output"></div>
+  <div style="margin-top:12px">
+    <input id="trackingId" class="form-control" type="text" placeholder="Tracking ID">
+    <div style="margin-top:12px"><button id="btnTrack" class="btn">Track</button></div>
+    <div id="trackOutput" style="margin-top:16px"></div>
+  </div>
 </main>
 
-<footer>&copy; 2025 Findero. All rights reserved.</footer>
+<div class="footer">© 2025 Findero. All rights reserved.</div>
+
+<script type="module">
+  import { initTrackPage } from './scripts/items.js';
+  import { initLogoutButton } from './scripts/auth.js';
+  initLogoutButton();
+  initTrackPage();
+</script>
 </body>
 </html>
