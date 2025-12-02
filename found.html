@@ -1,153 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Report Found Item - Findero</title>
-    <link rel="stylesheet" href="assets/styles.css" />
-    <style>
-        body {
-            background: #f4f6f8;
-            margin: 0;
-            font-family: Arial, sans-serif;
-        }
-        .container {
-            max-width: 450px;
-            margin: 40px auto;
-            background: #fff;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-        h2 {
-            text-align: center;
-            margin-bottom: 20px;
-            color: #222;
-        }
-        label {
-            font-weight: bold;
-            display: block;
-            margin: 10px 0 5px;
-        }
-        input, textarea, select {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #bbb;
-            border-radius: 8px;
-            margin-bottom: 15px;
-        }
-        button {
-            width: 100%;
-            background: #007bff;
-            color: #fff;
-            padding: 12px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-        button:hover {
-            background: #0056c7;
-        }
-        .success-box {
-            display: none;
-            padding: 20px;
-            background: #e3ffe3;
-            border: 1px solid #82d882;
-            border-radius: 8px;
-            margin-top: 15px;
-        }
-        .track-id {
-            font-weight: bold;
-            margin-top: 10px;
-            color: #0a7b0a;
-            text-align: center;
-        }
-    </style>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Findero — Submit Found</title>
+<link rel="stylesheet" href="assets/styles.css">
 </head>
 <body>
+<header>
+  <img src="assets/logo.png" alt="Findero Logo">
+  <div><button id="btnLogout" class="btn ghost">Logout</button></div>
+</header>
 
-<div class="container">
-    <h2>Report Found Item</h2>
+<main class="container card">
+  <div class="title">Found an item?</div>
+  <div class="small">Share details so we can reconnect with the owner.</div>
 
-    <form id="foundForm">
-        <label>Item Name</label>
-        <input type="text" id="itemName" required />
+  <form id="foundForm" style="margin-top:12px">
+    <label>Item name</label>
+    <input id="itemName" class="form-control" type="text" placeholder="e.g., iPhone 13">
 
-        <label>Description</label>
-        <textarea id="description" rows="3" required></textarea>
+    <label>Location found</label>
+    <input id="locationFound" class="form-control" type="text" placeholder="e.g., Library">
 
-        <label>Location Found</label>
-        <input type="text" id="location" required />
+    <label>Date found</label>
+    <input id="dateFound" class="form-control" type="date">
 
-        <label>Date Found</label>
-        <input type="date" id="dateFound" required />
+    <label>Description</label>
+    <textarea id="description" class="form-control" placeholder="Details..."></textarea>
 
-        <label>Upload Item Image</label>
-        <input type="file" id="itemImage" accept="image/*" required />
+    <label>Image (optional)</label>
+    <input id="imageUpload" class="form-control" type="file" accept="image/*">
 
-        <button type="submit">Save & Generate Track ID</button>
-    </form>
-
-    <div class="success-box" id="successBox">
-        <p>Item saved successfully!</p>
-        <p class="track-id">Your Track ID: <span id="trackIdText"></span></p>
+    <div id="foundError" class="error" style="display:none"></div>
+    <div style="margin-top:12px">
+      <button class="btn" type="submit">Submit</button>
     </div>
-</div>
+  </form>
+</main>
+
+<div class="footer">© 2025 Findero. All rights reserved.</div>
 
 <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
-
-    const firebaseConfig = {
-        apiKey: "YOUR_API_KEY",
-        authDomain: "YOUR_AUTH_DOMAIN",
-        projectId: "YOUR_PROJECT_ID",
-        storageBucket: "YOUR_STORAGE_BUCKET",
-        messagingSenderId: "YOUR_SENDER_ID",
-        appId: "YOUR_APP_ID"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const storage = getStorage(app);
-
-    const foundForm = document.getElementById("foundForm");
-    const successBox = document.getElementById("successBox");
-
-    foundForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
-
-        try {
-            const name = document.getElementById("itemName").value;
-            const desc = document.getElementById("description").value;
-            const loc = document.getElementById("location").value;
-            const date = document.getElementById("dateFound").value;
-            const image = document.getElementById("itemImage").files[0];
-
-            const imageRef = ref(storage, `found_items/${Date.now()}_${image.name}`);
-            await uploadBytes(imageRef, image);
-            const imageURL = await getDownloadURL(imageRef);
-
-            const docRef = await addDoc(collection(db, "found_items"), {
-                name,
-                desc,
-                loc,
-                date,
-                imageURL,
-                createdAt: new Date().toISOString()
-            });
-
-            document.getElementById("trackIdText").innerText = docRef.id;
-
-            successBox.style.display = "block";
-            foundForm.reset();
-        } catch (error) {
-            alert("Error saving item: " + error.message);
-        }
-    });
+  import { initFoundPage } from './scripts/items.js';
+  import { initLogoutButton } from './scripts/auth.js';
+  initLogoutButton();
+  initFoundPage();
+  // show/hide error container correctly
+  document.getElementById('foundForm').addEventListener('submit', ()=>{ document.getElementById('foundError').style.display='block'; });
 </script>
-
 </body>
 </html>
