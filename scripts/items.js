@@ -1,90 +1,80 @@
-// items.js
-import { db } from "./firebase.js";
-import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
+// Search page wiring (live client-side search using fetchAllItems)
 export function initSearchPage() {
-  const input = document.getElementById("searchInput");
-  const resultsBox = document.getElementById("results");
-  const status = document.getElementById("status");
+
+  const input = document.getElementById('searchInput');
+  const results = document.getElementById('results');
+  const status = document.getElementById('status');
+
+  if (!input || !results) return;
 
   let allItems = [];
 
-  // Load items from Firestore
   async function loadItems() {
-    status.textContent = "Loading items...";
     try {
-      const lostSnap = await getDocs(collection(db, "lostItems"));
-      const foundSnap = await getDocs(collection(db, "foundItems"));
+      status.innerText = "Loading items...";
 
-      const lostItems = lostSnap.docs.map(d => ({ id: d.id, type: "lost", ...d.data() }));
-      const foundItems = foundSnap.docs.map(d => ({ id: d.id, type: "found", ...d.data() }));
+      // fetch object: { foundItems: [], lostItems: [] }
+      const data = await fetchAllItems();
 
-      allItems = [...lostItems, ...foundItems];
+      // merge into one array
+      allItems = [
+        ...data.foundItems.map(i => ({ ...i, type: "found" })),
+        ...data.lostItems.map(i => ({ ...i, type: "lost" }))
+      ];
 
-      status.textContent = `Loaded ${allItems.length} items`;
-      renderResults(allItems);
+      status.innerText = `${allItems.length} items loaded.`;
+
+      renderList(allItems);
+
     } catch (err) {
-      console.error("Error loading items", err);
-      status.textContent = "❌ Error loading items. Please refresh.";
+      status.innerText = "Error loading items: " + err.message;
     }
   }
 
-  // Filter based on search query
-  function searchItems(query) {
-    query = query.toLowerCase().trim();
+  function renderList(list) {
+    results.innerHTML = "";
 
-    if (!query) return allItems;
-
-    return allItems.filter(item => {
-      return (
-        item.name?.toLowerCase().includes(query) ||
-        item.location?.toLowerCase().includes(query) ||
-        item.description?.toLowerCase().includes(query) ||
-        item.date?.toLowerCase().includes(query) ||
-        item.trackingId?.toLowerCase().includes(query)
-      );
-    });
-  }
-
-  // Render items to the page
-  function renderResults(list) {
-    resultsBox.innerHTML = "";
-
-    if (list.length === 0) {
-      resultsBox.innerHTML = `
-        <div class="empty-state">
-          No items match your search.
-        </div>
-      `;
+    if (!list.length) {
+      results.innerHTML = `
+        <div class="error" style="grid-column:1/-1;text-align:center">
+          No items found.
+        </div>`;
       return;
     }
 
     list.forEach(item => {
-      const card = document.createElement("div");
-      card.className = "item-card";
+      const card = document.createElement('div');
+      card.className = "card card-item";
 
       card.innerHTML = `
-        <div class="tag ${item.type === 'found' ? 'found' : 'lost'}">
-          ${item.type.toUpperCase()}
+        <div style="display:flex;gap:12px;">
+          <img class="thumb" src="${esc(item.imageUrl || '')}" alt="">
+          <div>
+            <div style="font-weight:700">${esc(item.itemName)}</div>
+            <div class="small">Type: ${item.type === 'found' ? 'Found' : 'Lost'}</div>
+            <div class="small">Location: ${esc(item.locationFound || item.lostLocation || "-")}</div>
+            <div class="small">Date: ${esc(item.dateFound || item.lostDate || "-")}</div>
+            <div class="small">ID: ${esc(item.trackingId)}</div>
+          </div>
         </div>
-        <div class="item-name">${item.name || "Unnamed Item"}</div>
-        <div class="item-details">${item.description || "No description"}</div>
-        <div class="item-location">📍 ${item.location || "Unknown location"}</div>
-        <div class="item-date">📅 ${item.date || "Unknown date"}</div>
-        <div class="item-track">🔖 ${item.trackingId || "No tracking ID"}</div>
       `;
 
-      resultsBox.appendChild(card);
+      results.appendChild(card);
     });
   }
 
-  // Live search listener
-  input.addEventListener("input", () => {
-    const query = input.value;
-    const filtered = searchItems(query);
-    renderResults(filtered);
-  });
+  function applyFilter() {
+    const q = input.value.trim().toLowerCase();
+    if (!q) return renderList(allItems);
 
-  // Load all items on page load
+    const filtered = allItems.filter(item =>
+      JSON.stringify(item).toLowerCase().includes(q)
+    );
+
+    renderList(filtered);
+  }
+
+  input.addEventListener('input', applyFilter);
+
   loadItems();
 }
