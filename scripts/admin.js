@@ -1,6 +1,6 @@
 // ===== Firebase Config =====
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
+  apiKey: "YOUR_API_KEY", // Replace with your Firebase API key
   authDomain: "findero-39098.firebaseapp.com",
   projectId: "findero-39098",
   storageBucket: "findero-39098.appspot.com"
@@ -12,9 +12,8 @@ const auth = firebase.auth();
 const db = firebase.firestore();
 const storage = firebase.storage();
 
-// ===== Admin Credentials (example) =====
-// You can create real admin in Firebase Auth, or check email here
-const ADMIN_EMAIL = "admin@findero.com";
+// ===== Admin Credentials =====
+const ADMIN_EMAIL = "jowialchemystudios@gmail.com";
 
 // ===== Elements =====
 const loginSection = document.getElementById("login-section");
@@ -68,7 +67,7 @@ function loadReports() {
         <td>${data.userEmail || "Unknown"}</td>
         <td>${data.type}</td>
         <td>${data.description}</td>
-        <td><img src="${data.image}" width="100"></td>
+        <td>${data.image ? `<img src="${data.image}" width="100">` : "No image"}</td>
         <td>${data.status || "Pending"}</td>
         <td>
           <button onclick="updateStatus('${doc.id}','Found')">Mark Found</button>
