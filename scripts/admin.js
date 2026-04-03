@@ -1,54 +1,98 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Findero Admin Dashboard</title>
-  <link rel="stylesheet" href="css/style.css">
-</head>
-<body>
-  <!-- Logo -->
-  <div style="text-align:center; margin-top:20px;">
-    <img src="assets/logo.png" alt="Findero Logo" width="150">
-  </div>
+// ===== Firebase Config =====
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY", // Replace with your Firebase API key
+  authDomain: "findero-39098.firebaseapp.com",
+  projectId: "findero-39098",
+  storageBucket: "findero-39098.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
+};
 
-  <h1 style="text-align:center;">Findero Admin Dashboard</h1>
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+const storage = firebase.storage();
 
-  <!-- Login Form -->
-  <div id="login-section" style="max-width:400px; margin:auto; text-align:center;">
-    <h2>Admin Login</h2>
-    <input type="email" id="email" placeholder="Email" style="width:100%; padding:8px; margin:6px 0;">
-    <input type="password" id="password" placeholder="Password" style="width:100%; padding:8px; margin:6px 0;">
-    <button id="login-btn" style="width:100%; margin:10px 0;">Login</button>
-    <p id="login-error" style="color:red;"></p>
-  </div>
+// ===== Admin Credentials =====
+const ADMIN_EMAIL = "jowialchemystudios@gmail.com";
 
-  <!-- Dashboard Table -->
-  <div id="dashboard-section" style="display:none; max-width:1000px; margin:auto;">
-    <div style="text-align:right; margin-bottom:10px;">
-      <button id="logout-btn">Logout</button>
-    </div>
-    <h2>All Reports</h2>
-    <table border="1" id="reports-table" style="width:100%; border-collapse:collapse;">
-      <thead style="background-color:#FFD700; color:#000;">
-        <tr>
-          <th>ID</th>
-          <th>User</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Image</th>
-          <th>Status</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody style="background-color:#000; color:#FFD700;"></tbody>
-    </table>
-  </div>
+// ===== Elements =====
+const loginSection = document.getElementById("login-section");
+const dashboardSection = document.getElementById("dashboard-section");
+const loginBtn = document.getElementById("login-btn");
+const logoutBtn = document.getElementById("logout-btn");
+const emailInput = document.getElementById("email");
+const passwordInput = document.getElementById("password");
+const loginError = document.getElementById("login-error");
+const reportsTableBody = document.querySelector("#reports-table tbody");
 
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js"></script>
-  <script src="js/admin.js"></script>
-</body>
-</html>
+// ===== Login =====
+loginBtn.addEventListener("click", () => {
+  const email = emailInput.value;
+  const password = passwordInput.value;
+
+  auth.signInWithEmailAndPassword(email, password)
+    .then(userCredential => {
+      const user = userCredential.user;
+      if(user.email !== ADMIN_EMAIL){
+        loginError.textContent = "Not authorized as admin!";
+        auth.signOut();
+      } else {
+        loginSection.style.display = "none";
+        dashboardSection.style.display = "block";
+        loadReports();
+      }
+    })
+    .catch(error => {
+      loginError.textContent = error.message;
+    });
+});
+
+// ===== Logout =====
+logoutBtn.addEventListener("click", () => {
+  auth.signOut();
+  dashboardSection.style.display = "none";
+  loginSection.style.display = "block";
+});
+
+// ===== Load Reports =====
+function loadReports() {
+  db.collection("items").orderBy("date", "desc").onSnapshot(snapshot => {
+    reportsTableBody.innerHTML = ""; // clear table
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      const tr = document.createElement("tr");
+
+      tr.innerHTML = `
+        <td>${doc.id}</td>
+        <td>${data.userEmail || "Unknown"}</td>
+        <td>${data.type}</td>
+        <td>${data.description}</td>
+        <td>${data.image ? `<img src="${data.image}" width="100">` : "No image"}</td>
+        <td>${data.status || "Pending"}</td>
+        <td>
+          <button onclick="updateStatus('${doc.id}','Found')">Mark Found</button>
+          <button onclick="deleteReport('${doc.id}')">Delete</button>
+        </td>
+      `;
+      reportsTableBody.appendChild(tr);
+    });
+  });
+}
+
+// ===== Update Status =====
+function updateStatus(id, status) {
+  db.collection("items").doc(id).update({status: status})
+    .then(() => alert("Status updated!"))
+    .catch(err => alert(err.message));
+}
+
+// ===== Delete Report =====
+function deleteReport(id) {
+  if(confirm("Are you sure you want to delete this report?")){
+    db.collection("items").doc(id).delete()
+      .then(() => alert("Deleted!"))
+      .catch(err => alert(err.message));
+  }
+}
