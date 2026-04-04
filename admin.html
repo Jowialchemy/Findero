@@ -13,6 +13,7 @@
   .status-btn { cursor: pointer; padding: 4px 8px; border-radius: 4px; border: none; }
   .Pending { background-color: #ff9800; color: white; }
   .Claimed { background-color: #4caf50; color: white; }
+  #searchBox { width: 100%; padding: 8px; margin: 12px 0; border-radius: 4px; border: 1px solid #ccc; }
 </style>
 </head>
 <body>
@@ -26,6 +27,9 @@
 <main class="container">
   <div class="title">Admin Dashboard</div>
   <div class="subtitle">Manage all reported items</div>
+
+  <!-- Search box -->
+  <input type="text" id="searchBox" placeholder="Search by Name, Type, Location, or Status">
 
   <table id="itemsTable">
     <thead>
