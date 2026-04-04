@@ -6,10 +6,10 @@
 <title>Findero — Home</title>
 <link rel="stylesheet" href="assets/styles.css">
 <style>
-  /* Branding colors & layout */
+  /* Branding & layout */
   body { font-family: Arial, sans-serif; background-color: #fefefe; color:#333; margin:0; }
-  header { display:flex; justify-content:space-between; align-items:center; padding:12px 24px; background-color:#0d47a1; color:white; }
-  header img { height:80px; } /* Bigger logo */
+  header { display:flex; justify-content:space-between; align-items:center; padding:12px 24px; background-color:#1976d2; color:white; } /* lighter blue */
+  header img { height:90px; } /* bigger logo */
   .btn { padding:8px 16px; border:none; border-radius:4px; cursor:pointer; text-decoration:none; font-weight:500; }
   .btn.ghost { background-color:transparent; color:white; border:1px solid white; }
   .btn.secondary { background-color:#ff9800; color:white; }
@@ -60,7 +60,7 @@ onAuthStateChanged(auth, user => {
       window.location.href = 'index.html';
     });
   }
-  // else: fallback links remain visible
+  // else: fallback static links remain visible
 });
 </script>
 </body>
