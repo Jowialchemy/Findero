@@ -1,29 +1,53 @@
-<input type="file" id="image">
-<input type="text" id="desc" placeholder="Description">
-<button onclick="submitItem('lost')">Submit</button>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Findero — Report Lost Item</title>
+<link rel="stylesheet" href="assets/styles.css">
+<style>
+  body { font-family: Arial, sans-serif; background-color:#fefefe; color:#333; margin:0; }
+  
+  /* Header */
+  header { display:flex; justify-content:space-between; align-items:center; padding:12px 24px; background-color:#888; color:white; box-shadow:0 2px 4px rgba(0,0,0,0.1); }
+  header img { height:90px; filter: drop-shadow(0 0 8px rgba(255,255,255,0.7)) drop-shadow(0 0 6px rgba(0,0,0,0.2)); transition: transform 0.3s ease; }
+  header img:hover { transform: scale(1.05); }
+  
+  .btn { padding:8px 16px; border:none; border-radius:4px; cursor:pointer; font-weight:500; text-decoration:none; }
+  .btn.secondary { background-color:#ff9800; color:white; }
+  .container { padding:24px; max-width:500px; margin:24px auto; text-align:center; }
+  .title { font-size:1.8rem; font-weight:700; color:#0d47a1; margin-bottom:12px; }
+  input, textarea { width:100%; padding:10px; margin:8px 0; border-radius:4px; border:1px solid #ccc; font-size:1rem; }
+  button { width:100%; margin-top:12px; }
+  .footer { text-align:center; padding:12px; background:#1976d2; color:white; margin-top:24px; font-size:0.9rem; }
 
-<script src="firebase.js"></script>
+</style>
+</head>
+<body>
+<header>
+  <img src="assets/logo.png" alt="Findero Logo">
+  <a class="btn secondary" href="dashboard.html">Dashboard</a>
+</header>
 
-<script>
-function submitItem(type){
-  const file = document.getElementById("image").files[0];
-  const desc = document.getElementById("desc").value;
+<main class="container">
+  <div class="title">Report Lost Item</div>
+  <form id="lostForm">
+    <input type="text" id="lostName" placeholder="Item Name" required>
+    <input type="text" id="lostLocation" placeholder="Location Lost" required>
+    <input type="date" id="lostDate" required>
+    <textarea id="lostDesc" placeholder="Description" rows="3"></textarea>
+    <input type="file" id="lostImage">
+    <button type="submit" class="btn secondary">Submit</button>
+    <div id="lostError" style="color:red; display:none; margin-top:8px;"></div>
+  </form>
+</main>
 
-  const ref = storage.ref("images/" + Date.now());
+<div class="footer">© 2025 Findero. All rights reserved.</div>
 
-  ref.put(file).then(() => {
-    ref.getDownloadURL().then(url => {
-
-      db.collection("items").add({
-        type: type,
-        description: desc,
-        image: url,
-        status: "Pending",
-        date: new Date()
-      });
-
-      alert("Uploaded successfully!");
-    });
-  });
-}
+<script type="module">
+import { initLostPage, protectPage } from './scripts/items.js';
+protectPage(true);
+initLostPage();
 </script>
+</body>
+</html>
