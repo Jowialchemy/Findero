@@ -6,12 +6,12 @@
 <title>Findero — Dashboard</title>
 <link rel="stylesheet" href="assets/styles.css">
 </head>
+
 <body>
+
 <header>
   <img src="assets/logo.png" alt="Findero Logo">
-  <div>
-    <button id="btnLogout" class="btn ghost">Logout</button>
-  </div>
+  <button id="btnLogout" class="btn ghost">Logout</button>
 </header>
 
 <main class="container">
@@ -19,40 +19,39 @@
   <div class="subtitle">Choose an action</div>
 
   <div class="results-grid">
-    <!-- Report Found Item -->
-    <a href="found.html" class="card card-action">
-      <div style="font-weight:700">Report Found Item</div>
-      <div class="small">Submit items you found so owners can claim them</div>
+
+    <a href="found.html" class="card action-card">
+      <h3>Report Found Item</h3>
+      <p>Submit items you found so owners can claim them</p>
     </a>
 
-    <!-- Report Lost Item -->
-    <a href="lost.html" class="card card-action">
-      <div style="font-weight:700">Report Lost Item</div>
-      <div class="small">Tell us what you lost so others can search</div>
+    <a href="lost.html" class="card action-card">
+      <h3>Report Lost Item</h3>
+      <p>Tell us what you lost so others can search</p>
     </a>
 
-    <!-- Search Items -->
-    <a href="search.html" class="card card-action secondary">
-      <div style="font-weight:700">Search Items</div>
-      <div class="small">Live search across found + lost items</div>
+    <a href="search.html" class="card action-card blue">
+      <h3>Search Items</h3>
+      <p>Live search across found + lost items</p>
     </a>
 
-    <!-- Track Item -->
-    <a href="track.html" class="card card-action secondary">
-      <div style="font-weight:700">Track Item</div>
-      <div class="small">Lookup by tracking ID</div>
+    <a href="track.html" class="card action-card blue">
+      <h3>Track Item</h3>
+      <p>Lookup by tracking ID</p>
     </a>
+
   </div>
 </main>
 
 <div class="footer">© 2025 Findero. All rights reserved.</div>
 
 <script type="module">
-import { initLogoutButton } from './scripts/auth.js';
 import { protectPage } from './scripts/items.js';
+import { initLogoutButton } from './scripts/auth.js';
 
 protectPage(true);
 initLogoutButton();
 </script>
+
 </body>
 </html>
