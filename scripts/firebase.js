@@ -1,4 +1,9 @@
-// firebase.js
+// Firebase v10 modular imports
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getStorage } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+
 const firebaseConfig = {
   apiKey: "AIzaSyDL_BRheLzGxDJ-6XbjitZw8HFmUzQwgaI",
   authDomain: "findero-39098.firebaseapp.com",
@@ -8,8 +13,9 @@ const firebaseConfig = {
   appId: "1:796711693094:web:616efe1fd7291759d02fe7"
 };
 
-firebase.initializeApp(firebaseConfig);
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const storage = getStorage(app);
 
-const auth = firebase.auth();
-const db = firebase.firestore();
-const storage = firebase.storage();
+export { app, auth, db, storage };
