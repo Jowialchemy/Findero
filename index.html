@@ -6,12 +6,12 @@
 <title>Findero — Home</title>
 <link rel="stylesheet" href="assets/styles.css">
 <style>
-  /* Branding colors */
-  body { font-family: Arial, sans-serif; background-color: #fefefe; color: #333; }
+  /* Branding colors & layout */
+  body { font-family: Arial, sans-serif; background-color: #fefefe; color:#333; margin:0; }
   header { display:flex; justify-content:space-between; align-items:center; padding:12px 24px; background-color:#0d47a1; color:white; }
-  header img { height:50px; }
+  header img { height:80px; } /* Bigger logo */
   .btn { padding:8px 16px; border:none; border-radius:4px; cursor:pointer; text-decoration:none; font-weight:500; }
-  .btn.ghost { background-color:transparent; color:white; border: 1px solid white; }
+  .btn.ghost { background-color:transparent; color:white; border:1px solid white; }
   .btn.secondary { background-color:#ff9800; color:white; }
   .container { padding:24px; text-align:center; }
   .title { font-size:2rem; font-weight:700; margin-bottom:8px; color:#0d47a1; }
@@ -23,7 +23,11 @@
 <body>
 <header>
   <img src="assets/logo.png" alt="Findero Logo">
-  <div id="authLinks" style="display:flex;gap:8px;align-items:center"></div>
+  <!-- Fallback static links -->
+  <div id="authLinks" style="display:flex;gap:8px;align-items:center">
+    <a class="btn ghost" href="login.html">Login</a>
+    <a class="btn secondary" href="signup.html">Sign Up</a>
+  </div>
 </header>
 
 <main class="container">
@@ -43,10 +47,10 @@
 <script type="module">
 import { auth, onAuthStateChanged } from './scripts/firebase.js';
 
+// Update auth links if Firebase loads and user is logged in
 onAuthStateChanged(auth, user => {
   const authLinks = document.getElementById('authLinks');
   if(user){
-    // Logged-in view
     authLinks.innerHTML = `
       <a class="btn ghost" href="dashboard.html">Dashboard</a>
       <button id="btnLogout" class="btn ghost">Logout</button>
@@ -55,13 +59,8 @@ onAuthStateChanged(auth, user => {
       await auth.signOut();
       window.location.href = 'index.html';
     });
-  } else {
-    // Logged-out view
-    authLinks.innerHTML = `
-      <a class="btn ghost" href="login.html">Login</a>
-      <a class="btn secondary" href="signup.html">Sign Up</a>
-    `;
   }
+  // else: fallback links remain visible
 });
 </script>
 </body>
