@@ -3,75 +3,66 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Findero — Track Item</title>
+<title>Track Item — Findero</title>
 <link rel="stylesheet" href="assets/styles.css">
-<style>
-  body { font-family: Arial, sans-serif; background:#fefefe; color:#333; margin:0; }
-  
-  header { display:flex; justify-content:space-between; align-items:center; padding:12px 24px; background-color:#888; color:white; box-shadow:0 2px 4px rgba(0,0,0,0.1); }
-  header img { height:90px; filter: drop-shadow(0 0 8px rgba(255,255,255,0.7)) drop-shadow(0 0 6px rgba(0,0,0,0.2)); transition: transform 0.3s ease; }
-  header img:hover { transform: scale(1.05); }
-
-  .container { padding:24px; max-width:500px; margin:24px auto; text-align:center; }
-  .title { font-size:1.8rem; font-weight:700; color:#0d47a1; margin-bottom:12px; }
-  input { width:100%; padding:10px; margin:8px 0; border-radius:4px; border:1px solid #ccc; font-size:1rem; }
-  .btn { padding:8px 16px; border:none; border-radius:4px; cursor:pointer; font-weight:500; text-decoration:none; }
-  .btn.secondary { background-color:#ff9800; color:white; margin-top:8px; }
-
-  .result-card { border:1px solid #ccc; border-radius:6px; padding:12px; margin-top:12px; background:white; box-shadow:0 2px 4px rgba(0,0,0,0.05); }
-  .footer { text-align:center; padding:12px; background:#1976d2; color:white; margin-top:24px; font-size:0.9rem; }
-</style>
 </head>
 <body>
 <header>
   <img src="assets/logo.png" alt="Findero Logo">
-  <a class="btn secondary" href="dashboard.html">Dashboard</a>
+  <div>
+    <a class="btn ghost" href="dashboard.html">Dashboard</a>
+    <button id="btnLogout" class="btn ghost">Logout</button>
+  </div>
 </header>
 
 <main class="container">
   <div class="title">Track Item</div>
-  <input type="text" id="trackId" placeholder="Enter Item ID">
-  <button class="btn secondary" onclick="trackItem()">Track</button>
+  <div class="subtitle">Lookup by item ID</div>
 
-  <div id="result" style="margin-top:16px"></div>
+  <input type="text" id="trackInput" placeholder="Enter Item ID" style="margin-bottom:12px">
+  <button class="btn secondary" id="trackBtn">Track</button>
+  <div id="trackResult" class="results-grid" style="margin-top:12px"></div>
 </main>
 
 <div class="footer">© 2025 Findero. All rights reserved.</div>
 
 <script type="module">
-import { protectPage } from './scripts/items.js';
-import { db } from './scripts/firebase.js';
+import { protectPage, db } from './scripts/items.js';
+import { initLogoutButton } from './scripts/auth.js';
 import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 protectPage(true);
+initLogoutButton();
 
-async function trackItem(){
-  const id = document.getElementById('trackId').value.trim();
-  const resultDiv = document.getElementById('result');
-  if(!id) { resultDiv.innerHTML = "<p>Please enter an ID.</p>"; return; }
+const input = document.getElementById('trackInput');
+const btn = document.getElementById('trackBtn');
+const resultDiv = document.getElementById('trackResult');
 
-  try {
-    const docRef = doc(db, "items", id);
-    const docSnap = await getDoc(docRef);
+btn.addEventListener('click', async () => {
+  const id = input.value.trim();
+  resultDiv.innerHTML = "";
 
-    if(docSnap.exists()){
-      const data = docSnap.data();
-      resultDiv.innerHTML = `
-        <div class="result-card">
-          <strong>Type:</strong> ${data.type}<br>
-          <strong>Description:</strong> ${data.description || "-"}<br>
-          ${data.image ? `<img src="${data.image}" style="width:100px; margin-top:4px; border-radius:4px;">` : ""}
-          <br><small>Status: ${data.status || "Pending"}</small>
-        </div>
-      `;
-    } else {
-      resultDiv.innerHTML = "<p>Item not found.</p>";
-    }
+  if(!id){ alert("Please enter an Item ID"); return; }
 
-  } catch(err){
-    resultDiv.innerHTML = `<p style="color:red;">Error: ${err.message}</p>`;
+  const docRef = doc(db, "items", id);
+  const docSnap = await getDoc(docRef);
+
+  if(docSnap.exists()){
+    const data = docSnap.data();
+    const div = document.createElement('div');
+    div.className = 'card';
+    div.innerHTML = `
+      <div><strong>Type:</strong> ${data.type}</div>
+      <div><strong>Description:</strong> ${data.description}</div>
+      ${data.image ? `<img src="${data.image}" style="width:100%;margin-top:6px;border-radius:4px">` : ""}
+      <div><strong>Status:</strong> ${data.status}</div>
+      <div><strong>Date:</strong> ${new Date(data.date.seconds*1000).toLocaleString()}</div>
+    `;
+    resultDiv.appendChild(div);
+  } else {
+    resultDiv.innerHTML = `<div class="card">No item found with this ID.</div>`;
   }
-}
+});
 </script>
 </body>
 </html>
