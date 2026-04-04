@@ -3,33 +3,75 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Findero — Track</title>
+<title>Findero — Track Item</title>
 <link rel="stylesheet" href="assets/styles.css">
+<style>
+  body { font-family: Arial, sans-serif; background:#fefefe; color:#333; margin:0; }
+  
+  header { display:flex; justify-content:space-between; align-items:center; padding:12px 24px; background-color:#888; color:white; box-shadow:0 2px 4px rgba(0,0,0,0.1); }
+  header img { height:90px; filter: drop-shadow(0 0 8px rgba(255,255,255,0.7)) drop-shadow(0 0 6px rgba(0,0,0,0.2)); transition: transform 0.3s ease; }
+  header img:hover { transform: scale(1.05); }
+
+  .container { padding:24px; max-width:500px; margin:24px auto; text-align:center; }
+  .title { font-size:1.8rem; font-weight:700; color:#0d47a1; margin-bottom:12px; }
+  input { width:100%; padding:10px; margin:8px 0; border-radius:4px; border:1px solid #ccc; font-size:1rem; }
+  .btn { padding:8px 16px; border:none; border-radius:4px; cursor:pointer; font-weight:500; text-decoration:none; }
+  .btn.secondary { background-color:#ff9800; color:white; margin-top:8px; }
+
+  .result-card { border:1px solid #ccc; border-radius:6px; padding:12px; margin-top:12px; background:white; box-shadow:0 2px 4px rgba(0,0,0,0.05); }
+  .footer { text-align:center; padding:12px; background:#1976d2; color:white; margin-top:24px; font-size:0.9rem; }
+</style>
 </head>
 <body>
 <header>
   <img src="assets/logo.png" alt="Findero Logo">
-  <div><button id="btnLogout" class="btn ghost">Logout</button></div>
+  <a class="btn secondary" href="dashboard.html">Dashboard</a>
 </header>
 
 <main class="container">
-  <div class="title">Track an Item</div>
-  <div class="small">Enter the tracking ID provided when the item was submitted</div>
+  <div class="title">Track Item</div>
+  <input type="text" id="trackId" placeholder="Enter Item ID">
+  <button class="btn secondary" onclick="trackItem()">Track</button>
 
-  <div style="margin-top:12px">
-    <input id="trackingId" class="form-control" type="text" placeholder="Tracking ID">
-    <div style="margin-top:12px"><button id="btnTrack" class="btn">Track</button></div>
-    <div id="trackOutput" style="margin-top:16px"></div>
-  </div>
+  <div id="result" style="margin-top:16px"></div>
 </main>
 
 <div class="footer">© 2025 Findero. All rights reserved.</div>
 
 <script type="module">
-  import { initTrackPage } from './scripts/items.js';
-  import { initLogoutButton } from './scripts/auth.js';
-  initLogoutButton();
-  initTrackPage();
+import { protectPage } from './scripts/items.js';
+import { db } from './scripts/firebase.js';
+import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+protectPage(true);
+
+async function trackItem(){
+  const id = document.getElementById('trackId').value.trim();
+  const resultDiv = document.getElementById('result');
+  if(!id) { resultDiv.innerHTML = "<p>Please enter an ID.</p>"; return; }
+
+  try {
+    const docRef = doc(db, "items", id);
+    const docSnap = await getDoc(docRef);
+
+    if(docSnap.exists()){
+      const data = docSnap.data();
+      resultDiv.innerHTML = `
+        <div class="result-card">
+          <strong>Type:</strong> ${data.type}<br>
+          <strong>Description:</strong> ${data.description || "-"}<br>
+          ${data.image ? `<img src="${data.image}" style="width:100px; margin-top:4px; border-radius:4px;">` : ""}
+          <br><small>Status: ${data.status || "Pending"}</small>
+        </div>
+      `;
+    } else {
+      resultDiv.innerHTML = "<p>Item not found.</p>";
+    }
+
+  } catch(err){
+    resultDiv.innerHTML = `<p style="color:red;">Error: ${err.message}</p>`;
+  }
+}
 </script>
 </body>
 </html>
