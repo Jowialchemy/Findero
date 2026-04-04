@@ -1,71 +1,40 @@
-/* Global Styles */
-body {
-  font-family: Arial, sans-serif;
-  background: #fefefe;
-  color: #333;
-  margin: 0;
+/* Card styling */
+.results-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
 }
 
-/* Header */
-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 24px;
-  background-color: #888;
-  color: white;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-header img {
-  height: 90px;
-  filter: drop-shadow(0 0 8px rgba(255,255,255,0.7))
-          drop-shadow(0 0 6px rgba(0,0,0,0.2));
-  transition: transform 0.3s ease;
-}
-
-header img:hover { transform: scale(1.05); }
-
-/* Buttons */
-.btn {
-  padding: 8px 16px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: 500;
+.card {
+  padding: 16px;
+  border-radius: 12px;
+  background-color: #f5f5f5;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   text-decoration: none;
+  color: inherit;
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.btn.secondary { background-color: #ff9800; color: white; }
-.btn.ghost { background-color: transparent; color: white; border: 1px solid white; }
-
-/* Container & Titles */
-.container { padding: 24px; max-width: 800px; margin: 24px auto; text-align: center; }
-.title { font-size: 1.8rem; font-weight: 700; color: #0d47a1; margin-bottom: 12px; }
-.subtitle { font-size: 1.1rem; margin-bottom: 16px; }
-
-/* Inputs & Forms */
-input, textarea, select {
-  width: 100%;
-  padding: 10px;
-  margin: 8px 0;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-  font-size: 1rem;
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.15);
 }
 
-textarea { resize: vertical; }
-
-/* Cards & Results */
-.results-grid, .results { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }
-.card, .result-card {
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  padding: 12px;
-  background: white;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-  width: 220px;
+/* Highlight cards for actions */
+.card-action {
+  border: 2px solid #1976d2;
+  background-color: #e3f2fd;
 }
 
-/* Footer */
-.footer { text-align: center; padding: 12px; background: #1976d2; color: white; font-size: 0.9rem; margin-top: 24px; }
+/* Secondary cards */
+.card-action.secondary {
+  border: 2px solid #64b5f6;
+  background-color: #bbdefb;
+}
+
+.card .small {
+  margin-top: 6px;
+  font-size: 0.85rem;
+  color: #555;
+}
