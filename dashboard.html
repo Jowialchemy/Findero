@@ -8,7 +8,7 @@
 </head>
 <body>
 <header>
-  <img src="assets/logo.png" alt="Findero Logo">
+  <img src="assets/logo.png" alt="Findero Logo" style="height:50px;">
   <div>
     <button id="btnLogout" class="btn ghost">Logout</button>
   </div>
@@ -19,24 +19,28 @@
   <div class="subtitle">Choose an action</div>
 
   <div class="results-grid">
+    <!-- Found Item -->
     <div class="card">
       <div style="font-weight:700">Report Found Item</div>
       <div class="small">Submit items you found so owners can claim them</div>
       <div style="margin-top:12px"><a class="btn" href="found.html">Open</a></div>
     </div>
 
+    <!-- Lost Item -->
     <div class="card">
       <div style="font-weight:700">Report Lost Item</div>
       <div class="small">Tell us what you lost so others can search</div>
       <div style="margin-top:12px"><a class="btn" href="lost.html">Open</a></div>
     </div>
 
+    <!-- Search Items -->
     <div class="card">
       <div style="font-weight:700">Search Items</div>
       <div class="small">Live search across found + lost items</div>
       <div style="margin-top:12px"><a class="btn secondary" href="search.html">Search</a></div>
     </div>
 
+    <!-- Track Item -->
     <div class="card">
       <div style="font-weight:700">Track Item</div>
       <div class="small">Lookup by tracking ID</div>
@@ -47,10 +51,15 @@
 
 <div class="footer">© 2025 Findero. All rights reserved.</div>
 
+<!-- ================= SCRIPTS ================= -->
 <script type="module">
   import { initLogoutButton } from './scripts/auth.js';
   import { protectPage } from './scripts/items.js';
+
+  // 🔒 Protect dashboard — redirects to login if not logged in
   protectPage(true);
+
+  // 🔑 Initialize logout button
   initLogoutButton();
 </script>
 </body>
