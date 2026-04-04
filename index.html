@@ -8,11 +8,31 @@
 <style>
   /* Branding & layout */
   body { font-family: Arial, sans-serif; background-color: #fefefe; color:#333; margin:0; }
-  header { display:flex; justify-content:space-between; align-items:center; padding:12px 24px; background-color:#1976d2; color:white; } /* lighter blue */
-  header img { height:90px; } /* bigger logo */
+  
+  header {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:12px 24px;
+    background-color:#1976d2; /* lighter blue */
+    color:white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  
+  header img {
+    height:90px; /* bigger logo */
+    filter: drop-shadow(0 0 8px rgba(255,255,255,0.7)) drop-shadow(0 0 6px rgba(0,0,0,0.2));
+    transition: transform 0.3s ease;
+  }
+
+  header img:hover {
+    transform: scale(1.05); /* subtle hover pop */
+  }
+
   .btn { padding:8px 16px; border:none; border-radius:4px; cursor:pointer; text-decoration:none; font-weight:500; }
   .btn.ghost { background-color:transparent; color:white; border:1px solid white; }
   .btn.secondary { background-color:#ff9800; color:white; }
+
   .container { padding:24px; text-align:center; }
   .title { font-size:2rem; font-weight:700; margin-bottom:8px; color:#0d47a1; }
   .subtitle { font-size:1rem; margin-bottom:16px; }
