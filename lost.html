@@ -1,52 +1,29 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Findero — Report Lost</title>
-<link rel="stylesheet" href="assets/styles.css">
-</head>
-<body>
-<header>
-  <img src="assets/logo.png" alt="Findero Logo">
-  <div><button id="btnLogout" class="btn ghost">Logout</button></div>
-</header>
+<input type="file" id="image">
+<input type="text" id="desc" placeholder="Description">
+<button onclick="submitItem('lost')">Submit</button>
 
-<main class="container card">
-  <div class="title">Lost an item?</div>
-  <div class="small">Tell us what you lost so others can help find it.</div>
+<script src="firebase.js"></script>
 
-  <form id="lostForm" style="margin-top:12px">
-    <label>Item name</label>
-    <input id="lostName" class="form-control" type="text" placeholder="e.g., Wallet">
+<script>
+function submitItem(type){
+  const file = document.getElementById("image").files[0];
+  const desc = document.getElementById("desc").value;
 
-    <label>Location lost</label>
-    <input id="lostLocation" class="form-control" type="text" placeholder="e.g., Bus stop">
+  const ref = storage.ref("images/" + Date.now());
 
-    <label>Date lost</label>
-    <input id="lostDate" class="form-control" type="date">
+  ref.put(file).then(() => {
+    ref.getDownloadURL().then(url => {
 
-    <label>Description</label>
-    <textarea id="lostDesc" class="form-control" placeholder="Details..."></textarea>
+      db.collection("items").add({
+        type: type,
+        description: desc,
+        image: url,
+        status: "Pending",
+        date: new Date()
+      });
 
-    <label>Image (optional)</label>
-    <input id="lostImage" class="form-control" type="file" accept="image/*">
-
-    <div id="lostError" class="error" style="display:none"></div>
-    <div style="margin-top:12px">
-      <button class="btn" type="submit">Submit</button>
-    </div>
-  </form>
-</main>
-
-<div class="footer">© 2025 Findero. All rights reserved.</div>
-
-<script type="module">
-  import { initLostPage } from './scripts/items.js';
-  import { initLogoutButton } from './scripts/auth.js';
-  initLogoutButton();
-  initLostPage();
-  document.getElementById('lostForm').addEventListener('submit', ()=>{ document.getElementById('lostError').style.display='block'; });
+      alert("Uploaded successfully!");
+    });
+  });
+}
 </script>
-</body>
-</html>
