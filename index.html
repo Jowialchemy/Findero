@@ -4,84 +4,196 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Findero — Home</title>
+
 <link rel="stylesheet" href="assets/styles.css">
+
 <style>
-  /* Branding & layout */
-  body { font-family: Arial, sans-serif; background-color: #fefefe; color:#333; margin:0; }
-  
-  header {
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    padding:12px 24px;
-    background-color:#1976d2; /* lighter blue */
-    color:white;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  }
-  
-  header img {
-    height:90px; /* bigger logo */
-    filter: drop-shadow(0 0 8px rgba(255,255,255,0.7)) drop-shadow(0 0 6px rgba(0,0,0,0.2));
-    transition: transform 0.3s ease;
-  }
+/* PAGE */
+body {
+  font-family: Arial, sans-serif;
+  background-color: #fefefe;
+  margin: 0;
+  color: #333;
+}
 
-  header img:hover {
-    transform: scale(1.05); /* subtle hover pop */
-  }
+/* HEADER */
+header {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:12px 24px;
+  background-color:#1976d2;
+  color:white;
+}
 
-  .btn { padding:8px 16px; border:none; border-radius:4px; cursor:pointer; text-decoration:none; font-weight:500; }
-  .btn.ghost { background-color:transparent; color:white; border:1px solid white; }
-  .btn.secondary { background-color:#ff9800; color:white; }
+header img {
+  height:90px;
+  filter: drop-shadow(0 0 10px rgba(255,255,255,0.7))
+          drop-shadow(0 0 6px rgba(0,0,0,0.3));
+}
 
-  .container { padding:24px; text-align:center; }
-  .title { font-size:2rem; font-weight:700; margin-bottom:8px; color:#0d47a1; }
-  .subtitle { font-size:1rem; margin-bottom:16px; }
-  .footer { text-align:center; padding:12px; background:#f4f4f4; margin-top:24px; font-size:0.9rem; color:#666; }
-  .action-buttons { display:flex; gap:12px; flex-wrap:wrap; justify-content:center; margin-top:12px; }
+/* BUTTONS */
+.btn {
+  padding:8px 14px;
+  border-radius:6px;
+  text-decoration:none;
+  font-size:14px;
+}
+
+.btn.ghost {
+  color:white;
+  border:1px solid white;
+}
+
+.btn.secondary {
+  background:#ff9800;
+  color:white;
+}
+
+/* CONTENT */
+.container {
+  padding:30px;
+  text-align:center;
+}
+
+.title {
+  font-size:26px;
+  font-weight:bold;
+  color:#0d47a1;
+}
+
+.subtitle {
+  margin-top:8px;
+  color:#555;
+}
+
+/* GRID */
+.results-grid {
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap:18px;
+  margin-top:30px;
+}
+
+/* CARD BASE */
+.card {
+  padding:20px;
+  border-radius:12px;
+  text-decoration:none;
+  color:#333;
+  background:white;
+  border:2px solid transparent;
+  transition:0.3s;
+}
+
+/* FOUND & LOST */
+.action-card {
+  border:2px solid #1976d2;
+  background:#e3f2fd;
+}
+
+/* SEARCH & TRACK */
+.action-card.blue {
+  border:2px solid #64b5f6;
+  background:#bbdefb;
+}
+
+/* HOVER */
+.card:hover {
+  transform:translateY(-6px);
+  box-shadow:0 10px 25px rgba(0,0,0,0.15);
+}
+
+/* TEXT */
+.card h3 {
+  margin:0;
+}
+
+.card p {
+  margin-top:6px;
+  font-size:14px;
+  color:#555;
+}
+
+/* FOOTER */
+.footer {
+  text-align:center;
+  padding:12px;
+  background:#1976d2;
+  color:white;
+  margin-top:40px;
+}
 </style>
+
 </head>
+
 <body>
+
 <header>
   <img src="assets/logo.png" alt="Findero Logo">
-  <!-- Fallback static links -->
-  <div id="authLinks" style="display:flex;gap:8px;align-items:center">
+
+  <div id="authLinks" style="display:flex;gap:8px;">
     <a class="btn ghost" href="login.html">Login</a>
     <a class="btn secondary" href="signup.html">Sign Up</a>
   </div>
 </header>
 
 <main class="container">
-  <div class="title">Welcome to Findero</div>
-  <div class="subtitle">Report lost or found items, search the database, or track by ID.</div>
 
-  <div class="action-buttons">
-    <a class="btn" href="found.html">Report Found Item</a>
-    <a class="btn" href="lost.html">Report Lost Item</a>
-    <a class="btn secondary" href="search.html">Search Items</a>
-    <a class="btn secondary" href="track.html">Track Item</a>
+  <div class="title">Welcome to Findero</div>
+  <div class="subtitle">
+    Report lost or found items, search the database, or track by ID.
   </div>
+
+  <!-- ✅ COLORED CARDS (FIXED ISSUE HERE) -->
+  <div class="results-grid">
+
+    <a href="found.html" class="card action-card">
+      <h3>Report Found Item</h3>
+      <p>Submit items you found so owners can claim them</p>
+    </a>
+
+    <a href="lost.html" class="card action-card">
+      <h3>Report Lost Item</h3>
+      <p>Tell us what you lost so others can search</p>
+    </a>
+
+    <a href="search.html" class="card action-card blue">
+      <h3>Search Items</h3>
+      <p>Live search across found + lost items</p>
+    </a>
+
+    <a href="track.html" class="card action-card blue">
+      <h3>Track Item</h3>
+      <p>Lookup by tracking ID</p>
+    </a>
+
+  </div>
+
 </main>
 
 <div class="footer">© 2025 Findero. All rights reserved.</div>
 
 <script type="module">
-import { auth, onAuthStateChanged } from './scripts/firebase.js';
+import { auth } from './scripts/firebase.js';
+import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-// Update auth links if Firebase loads and user is logged in
 onAuthStateChanged(auth, user => {
   const authLinks = document.getElementById('authLinks');
+
   if(user){
     authLinks.innerHTML = `
       <a class="btn ghost" href="dashboard.html">Dashboard</a>
-      <button id="btnLogout" class="btn ghost">Logout</button>
+      <button id="logoutBtn" class="btn ghost">Logout</button>
     `;
-    document.getElementById('btnLogout').addEventListener('click', async ()=>{
-      await auth.signOut();
-      window.location.href = 'index.html';
-    });
+
+    document.getElementById('logoutBtn').onclick = async () => {
+      await signOut(auth);
+      window.location.reload();
+    };
   }
-  // else: fallback static links remain visible
 });
 </script>
+
 </body>
 </html>
