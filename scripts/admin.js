@@ -1,60 +1,99 @@
-// admin.js
+// scripts/admin.js
 
-const ADMIN_EMAIL = "jowialchemystudios@gmail.com";
+import { app } from "./firebase.js";
+import { auth } from "./firebase.js";
+import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {
+  getFirestore,
+  collection,
+  getDocs,
+  doc,
+  updateDoc,
+  query,
+  orderBy
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-const loginBtn = document.getElementById("login-btn");
-const email = document.getElementById("email");
-const password = document.getElementById("password");
-const error = document.getElementById("login-error");
+const db = getFirestore(app);
 
-const loginSection = document.getElementById("login-section");
-const dashboardSection = document.getElementById("dashboard-section");
+// ================= PROTECT ADMIN PAGE =================
+onAuthStateChanged(auth, user => {
+  if(!user){
+    window.location.href = "login.html";
+  }
+});
 
-loginBtn.onclick = () => {
-  auth.signInWithEmailAndPassword(email.value, password.value)
-    .then((userCred) => {
-      if (userCred.user.email !== ADMIN_EMAIL) {
-        error.innerText = "Not authorized";
-        auth.signOut();
-        return;
-      }
-
-      loginSection.style.display = "none";
-      dashboardSection.style.display = "block";
-      loadItems();
-    })
-    .catch(err => error.innerText = err.message);
-};
-
-// LOAD ITEMS
-function loadItems() {
-  db.collection("items").onSnapshot(snapshot => {
-    const table = document.getElementById("tbody");
-    table.innerHTML = "";
-
-    snapshot.forEach(doc => {
-      const data = doc.data();
-
-      table.innerHTML += `
-        <tr>
-          <td>${data.type}</td>
-          <td>${data.description}</td>
-          <td><img src="${data.image}" width="80"></td>
-          <td>${data.status || "Pending"}</td>
-          <td>
-            <button onclick="markFound('${doc.id}')">Found</button>
-            <button onclick="deleteItem('${doc.id}')">Delete</button>
-          </td>
-        </tr>
-      `;
-    });
+// ================= LOGOUT BUTTON =================
+const btnLogout = document.getElementById('btnLogout');
+if(btnLogout){
+  btnLogout.addEventListener('click', async () => {
+    await signOut(auth);
+    window.location.href = 'login.html';
   });
 }
 
-function markFound(id){
-  db.collection("items").doc(id).update({status:"Found"});
+// ================= LOAD ITEMS =================
+async function loadItems(){
+  const tbody = document.querySelector("#itemsTable tbody");
+  tbody.innerHTML = '';
+
+  const q = query(collection(db, "items"), orderBy("createdAt", "desc"));
+  const snapshot = await getDocs(q);
+
+  snapshot.forEach(docSnap => {
+    const data = docSnap.data();
+    const tr = document.createElement("tr");
+
+    // ID
+    const idTd = document.createElement("td");
+    idTd.innerText = docSnap.id;
+
+    // Type
+    const typeTd = document.createElement("td");
+    typeTd.innerText = data.type;
+
+    // Name
+    const nameTd = document.createElement("td");
+    nameTd.innerText = data.itemName || "-";
+
+    // Description
+    const descTd = document.createElement("td");
+    descTd.innerText = data.description || "-";
+
+    // Location
+    const locTd = document.createElement("td");
+    locTd.innerText = data.location || "-";
+
+    // Date
+    const dateTd = document.createElement("td");
+    dateTd.innerText = data.date || "-";
+
+    // Image
+    const imgTd = document.createElement("td");
+    if(data.image){
+      const imgEl = document.createElement("img");
+      imgEl.src = data.image;
+      imgTd.appendChild(imgEl);
+    } else {
+      imgTd.innerText = "-";
+    }
+
+    // Status + Button
+    const statusTd = document.createElement("td");
+    const btn = document.createElement("button");
+    btn.innerText = data.status || "Pending";
+    btn.className = `status-btn ${data.status || "Pending"}`;
+    btn.addEventListener("click", async () => {
+      const newStatus = (data.status === "Pending") ? "Claimed" : "Pending";
+      await updateDoc(doc(db, "items", docSnap.id), { status: newStatus });
+      loadItems(); // reload table
+    });
+    statusTd.appendChild(btn);
+
+    // Append all columns
+    tr.append(idTd, typeTd, nameTd, descTd, locTd, dateTd, imgTd, statusTd);
+    tbody.appendChild(tr);
+  });
 }
 
-function deleteItem(id){
-  db.collection("items").doc(id).delete();
-}
+// Initial load
+loadItems();
