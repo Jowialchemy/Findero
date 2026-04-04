@@ -8,7 +8,7 @@
 <link rel="stylesheet" href="assets/styles.css">
 
 <style>
-/* PAGE */
+/* BODY */
 body {
   font-family: Arial, sans-serif;
   background-color: #fefefe;
@@ -70,48 +70,36 @@ header img {
 /* GRID */
 .results-grid {
   display:grid;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-  gap:18px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap:14px;
   margin-top:30px;
 }
 
-/* CARD BASE */
+/* ORANGE CARDS */
 .card {
-  padding:20px;
-  border-radius:12px;
+  padding:14px;
+  border-radius:10px;
   text-decoration:none;
   color:#333;
-  background:white;
-  border:2px solid transparent;
-  transition:0.3s;
+  background:#fff3e0;
+  border:2px solid #ff9800;
+  transition:0.25s;
 }
 
-/* FOUND & LOST */
-.action-card {
-  border:2px solid #1976d2;
-  background:#e3f2fd;
-}
-
-/* SEARCH & TRACK */
-.action-card.blue {
-  border:2px solid #64b5f6;
-  background:#bbdefb;
-}
-
-/* HOVER */
 .card:hover {
-  transform:translateY(-6px);
-  box-shadow:0 10px 25px rgba(0,0,0,0.15);
+  transform:translateY(-4px);
+  box-shadow:0 8px 20px rgba(255,152,0,0.3);
+  background:#ffe0b2;
 }
 
-/* TEXT */
 .card h3 {
   margin:0;
+  font-size:15px;
 }
 
 .card p {
-  margin-top:6px;
-  font-size:14px;
+  margin-top:5px;
+  font-size:12px;
   color:#555;
 }
 
@@ -145,25 +133,25 @@ header img {
     Report lost or found items, search the database, or track by ID.
   </div>
 
-  <!-- ✅ COLORED CARDS (FIXED ISSUE HERE) -->
+  <!-- ✅ ORANGE CARDS -->
   <div class="results-grid">
 
-    <a href="found.html" class="card action-card">
+    <a href="found.html" class="card">
       <h3>Report Found Item</h3>
       <p>Submit items you found so owners can claim them</p>
     </a>
 
-    <a href="lost.html" class="card action-card">
+    <a href="lost.html" class="card">
       <h3>Report Lost Item</h3>
       <p>Tell us what you lost so others can search</p>
     </a>
 
-    <a href="search.html" class="card action-card blue">
+    <a href="search.html" class="card">
       <h3>Search Items</h3>
       <p>Live search across found + lost items</p>
     </a>
 
-    <a href="track.html" class="card action-card blue">
+    <a href="track.html" class="card">
       <h3>Track Item</h3>
       <p>Lookup by tracking ID</p>
     </a>
