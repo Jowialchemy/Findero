@@ -1,70 +1,89 @@
 // scripts/auth.js
-import { auth, onAuthStateChanged, signIn, signUp, signOut } from "./firebase.js";
 
-// initLogin attaches listeners only if login form present
+import { auth } from "./firebase.js";
+import {
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  onAuthStateChanged,
+  signOut as firebaseSignOut
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+// ================= LOGIN =================
 export function initLogin(){
   const loginBtn = document.getElementById('loginBtn');
-  const toggle = document.getElementById('togglePass');
-
   if(!loginBtn) return;
 
-  // redirect if already logged in
+  // If already logged in → go to dashboard
   onAuthStateChanged(auth, user => {
-    if(user) window.location.href = 'dashboard.html';
+    if(user){
+      window.location.href = "dashboard.html";
+    }
   });
-
-  // toggle password
-  if(toggle){
-    toggle.addEventListener('change', ()=> {
-      const p = document.getElementById('password');
-      if(p) p.type = toggle.checked ? 'text' : 'password';
-    });
-  }
 
   loginBtn.addEventListener('click', async () => {
     const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value;
-    if(!email || !password){ alert('Please enter email and password.'); return; }
+
+    if(!email || !password){
+      alert("Please enter email and password");
+      return;
+    }
+
     try {
-      await signIn(email, password);
-      window.location.href = 'dashboard.html';
-    } catch(err){ alert('Login failed: ' + err.message); }
+      await signInWithEmailAndPassword(auth, email, password);
+      window.location.href = "dashboard.html";
+    } catch(err){
+      alert("Login failed: " + err.message);
+    }
   });
 }
 
+// ================= SIGNUP =================
 export function initSignup(){
   const signupBtn = document.getElementById('signupBtn');
-  const toggle = document.getElementById('togglePass');
   if(!signupBtn) return;
 
+  // If already logged in → go to dashboard
   onAuthStateChanged(auth, user => {
-    if(user) window.location.href = 'dashboard.html';
+    if(user){
+      window.location.href = "dashboard.html";
+    }
   });
-
-  if(toggle){
-    toggle.addEventListener('change', ()=> {
-      const p = document.getElementById('password');
-      if(p) p.type = toggle.checked ? 'text' : 'password';
-    });
-  }
 
   signupBtn.addEventListener('click', async () => {
     const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value;
-    if(!email || !password){ alert('Please enter email and password.'); return; }
+
+    if(!email || !password){
+      alert("Please enter email and password");
+      return;
+    }
+
+    if(password.length < 6){
+      alert("Password must be at least 6 characters");
+      return;
+    }
+
     try {
-      await signUp(email, password);
-      window.location.href = 'dashboard.html';
-    } catch(err){ alert('Signup failed: ' + err.message); }
+      await createUserWithEmailAndPassword(auth, email, password);
+      window.location.href = "dashboard.html";
+    } catch(err){
+      alert("Signup failed: " + err.message);
+    }
   });
 }
 
-// Logout button wiring (any page)
+// ================= LOGOUT =================
 export function initLogoutButton(){
-  const el = document.getElementById('btnLogout');
-  if(!el) return;
-  el.addEventListener('click', async ()=> {
-    await signOut();
-    window.location.href = 'login.html';
+  const btn = document.getElementById('btnLogout');
+  if(!btn) return;
+
+  btn.addEventListener('click', async () => {
+    try {
+      await firebaseSignOut(auth);
+      window.location.href = "login.html";
+    } catch(err){
+      alert("Logout failed: " + err.message);
+    }
   });
-        }
+}
