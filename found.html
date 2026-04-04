@@ -1,53 +1,28 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Findero — Submit Found</title>
-<link rel="stylesheet" href="assets/styles.css">
-</head>
-<body>
-<header>
-  <img src="assets/logo.png" alt="Findero Logo">
-  <div><button id="btnLogout" class="btn ghost">Logout</button></div>
-</header>
+<input type="file" id="image">
+<input type="text" id="desc" placeholder="Description">
+<button onclick="submitItem('found')">Submit</button>
 
-<main class="container card">
-  <div class="title">Found an item?</div>
-  <div class="small">Share details so we can reconnect with the owner.</div>
+<script src="firebase.js"></script>
+<script>
+function submitItem(type){
+  const file = document.getElementById("image").files[0];
+  const desc = document.getElementById("desc").value;
 
-  <form id="foundForm" style="margin-top:12px">
-    <label>Item name</label>
-    <input id="itemName" class="form-control" type="text" placeholder="e.g., iPhone 13">
+  const ref = storage.ref("images/" + Date.now());
 
-    <label>Location found</label>
-    <input id="locationFound" class="form-control" type="text" placeholder="e.g., Library">
+  ref.put(file).then(() => {
+    ref.getDownloadURL().then(url => {
 
-    <label>Date found</label>
-    <input id="dateFound" class="form-control" type="date">
+      db.collection("items").add({
+        type: type,
+        description: desc,
+        image: url,
+        status: "Pending",
+        date: new Date()
+      });
 
-    <label>Description</label>
-    <textarea id="description" class="form-control" placeholder="Details..."></textarea>
-
-    <label>Image (optional)</label>
-    <input id="imageUpload" class="form-control" type="file" accept="image/*">
-
-    <div id="foundError" class="error" style="display:none"></div>
-    <div style="margin-top:12px">
-      <button class="btn" type="submit">Submit</button>
-    </div>
-  </form>
-</main>
-
-<div class="footer">© 2025 Findero. All rights reserved.</div>
-
-<script type="module">
-  import { initFoundPage } from './scripts/items.js';
-  import { initLogoutButton } from './scripts/auth.js';
-  initLogoutButton();
-  initFoundPage();
-  // show/hide error container correctly
-  document.getElementById('foundForm').addEventListener('submit', ()=>{ document.getElementById('foundError').style.display='block'; });
+      alert("Uploaded successfully!");
+    });
+  });
+}
 </script>
-</body>
-</html>
