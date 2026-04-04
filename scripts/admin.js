@@ -31,6 +31,8 @@ if(btnLogout){
   });
 }
 
+let allItems = []; // store items for search/filter
+
 // ================= LOAD ITEMS =================
 async function loadItems(){
   const tbody = document.querySelector("#itemsTable tbody");
@@ -39,13 +41,21 @@ async function loadItems(){
   const q = query(collection(db, "items"), orderBy("createdAt", "desc"));
   const snapshot = await getDocs(q);
 
-  snapshot.forEach(docSnap => {
-    const data = docSnap.data();
+  allItems = snapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
+  renderItems(allItems);
+}
+
+// ================= RENDER ITEMS =================
+function renderItems(items){
+  const tbody = document.querySelector("#itemsTable tbody");
+  tbody.innerHTML = '';
+
+  items.forEach(data => {
     const tr = document.createElement("tr");
 
     // ID
     const idTd = document.createElement("td");
-    idTd.innerText = docSnap.id;
+    idTd.innerText = data.id;
 
     // Type
     const typeTd = document.createElement("td");
@@ -84,14 +94,28 @@ async function loadItems(){
     btn.className = `status-btn ${data.status || "Pending"}`;
     btn.addEventListener("click", async () => {
       const newStatus = (data.status === "Pending") ? "Claimed" : "Pending";
-      await updateDoc(doc(db, "items", docSnap.id), { status: newStatus });
+      await updateDoc(doc(db, "items", data.id), { status: newStatus });
       loadItems(); // reload table
     });
     statusTd.appendChild(btn);
 
-    // Append all columns
     tr.append(idTd, typeTd, nameTd, descTd, locTd, dateTd, imgTd, statusTd);
     tbody.appendChild(tr);
+  });
+}
+
+// ================= SEARCH FILTER =================
+const searchBox = document.getElementById("searchBox");
+if(searchBox){
+  searchBox.addEventListener("input", (e)=>{
+    const searchTerm = e.target.value.toLowerCase();
+    const filtered = allItems.filter(item =>
+      (item.itemName && item.itemName.toLowerCase().includes(searchTerm)) ||
+      (item.type && item.type.toLowerCase().includes(searchTerm)) ||
+      (item.location && item.location.toLowerCase().includes(searchTerm)) ||
+      (item.status && item.status.toLowerCase().includes(searchTerm))
+    );
+    renderItems(filtered);
   });
 }
 
