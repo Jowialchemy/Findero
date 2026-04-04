@@ -5,13 +5,26 @@
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Findero — Dashboard</title>
 <link rel="stylesheet" href="assets/styles.css">
+<style>
+  body { font-family: Arial, sans-serif; margin:0; background:#fefefe; }
+  header { display:flex; justify-content:space-between; align-items:center; padding:12px 24px; background-color:#1976d2; color:white; box-shadow:0 2px 4px rgba(0,0,0,0.1); }
+  header img { height:90px; filter: drop-shadow(0 0 8px rgba(255,255,255,0.7)) drop-shadow(0 0 6px rgba(0,0,0,0.2)); transition: transform 0.3s ease; }
+  header img:hover { transform: scale(1.05); }
+  .btn { padding:8px 16px; border:none; border-radius:4px; cursor:pointer; font-weight:500; text-decoration:none; }
+  .btn.ghost { background-color:transparent; color:white; border:1px solid white; }
+  .btn.secondary { background-color:#ff9800; color:white; }
+  .container { padding:24px; text-align:center; }
+  .title { font-size:2rem; font-weight:700; margin-bottom:8px; color:#0d47a1; }
+  .subtitle { font-size:1rem; margin-bottom:16px; }
+  .results-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:16px; margin-top:16px; }
+  .card { background:#fff; border-radius:8px; padding:16px; box-shadow:0 2px 6px rgba(0,0,0,0.1); }
+  .footer { text-align:center; padding:12px; background:#f4f4f4; margin-top:24px; font-size:0.9rem; color:#666; }
+</style>
 </head>
 <body>
 <header>
-  <img src="assets/logo.png" alt="Findero Logo" style="height:50px;">
-  <div>
-    <button id="btnLogout" class="btn ghost">Logout</button>
-  </div>
+  <img src="assets/logo.png" alt="Findero Logo">
+  <button id="btnLogout" class="btn ghost">Logout</button>
 </header>
 
 <main class="container">
@@ -19,28 +32,24 @@
   <div class="subtitle">Choose an action</div>
 
   <div class="results-grid">
-    <!-- Found Item -->
     <div class="card">
       <div style="font-weight:700">Report Found Item</div>
       <div class="small">Submit items you found so owners can claim them</div>
-      <div style="margin-top:12px"><a class="btn" href="found.html">Open</a></div>
+      <div style="margin-top:12px"><a class="btn secondary" href="found.html">Open</a></div>
     </div>
 
-    <!-- Lost Item -->
     <div class="card">
       <div style="font-weight:700">Report Lost Item</div>
       <div class="small">Tell us what you lost so others can search</div>
-      <div style="margin-top:12px"><a class="btn" href="lost.html">Open</a></div>
+      <div style="margin-top:12px"><a class="btn secondary" href="lost.html">Open</a></div>
     </div>
 
-    <!-- Search Items -->
     <div class="card">
       <div style="font-weight:700">Search Items</div>
       <div class="small">Live search across found + lost items</div>
       <div style="margin-top:12px"><a class="btn secondary" href="search.html">Search</a></div>
     </div>
 
-    <!-- Track Item -->
     <div class="card">
       <div style="font-weight:700">Track Item</div>
       <div class="small">Lookup by tracking ID</div>
@@ -51,16 +60,10 @@
 
 <div class="footer">© 2025 Findero. All rights reserved.</div>
 
-<!-- ================= SCRIPTS ================= -->
 <script type="module">
-  import { initLogoutButton } from './scripts/auth.js';
-  import { protectPage } from './scripts/items.js';
-
-  // 🔒 Protect dashboard — redirects to login if not logged in
-  protectPage(true);
-
-  // 🔑 Initialize logout button
-  initLogoutButton();
+import { initLogoutButton, protectPage } from './scripts/auth.js';
+protectPage(true);
+initLogoutButton();
 </script>
 </body>
 </html>
