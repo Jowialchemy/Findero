@@ -5,21 +5,32 @@
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Findero — Home</title>
 <link rel="stylesheet" href="assets/styles.css">
+<style>
+  /* Branding colors */
+  body { font-family: Arial, sans-serif; background-color: #fefefe; color: #333; }
+  header { display:flex; justify-content:space-between; align-items:center; padding:12px 24px; background-color:#0d47a1; color:white; }
+  header img { height:50px; }
+  .btn { padding:8px 16px; border:none; border-radius:4px; cursor:pointer; text-decoration:none; font-weight:500; }
+  .btn.ghost { background-color:transparent; color:white; border: 1px solid white; }
+  .btn.secondary { background-color:#ff9800; color:white; }
+  .container { padding:24px; text-align:center; }
+  .title { font-size:2rem; font-weight:700; margin-bottom:8px; color:#0d47a1; }
+  .subtitle { font-size:1rem; margin-bottom:16px; }
+  .footer { text-align:center; padding:12px; background:#f4f4f4; margin-top:24px; font-size:0.9rem; color:#666; }
+  .action-buttons { display:flex; gap:12px; flex-wrap:wrap; justify-content:center; margin-top:12px; }
+</style>
 </head>
 <body>
 <header>
   <img src="assets/logo.png" alt="Findero Logo">
-  <div style="display:flex;gap:8px;align-items:center">
-    <a class="btn ghost" href="login.html">Login</a>
-    <a class="btn secondary" href="signup.html">Sign Up</a>
-  </div>
+  <div id="authLinks" style="display:flex;gap:8px;align-items:center"></div>
 </header>
 
 <main class="container">
   <div class="title">Welcome to Findero</div>
   <div class="subtitle">Report lost or found items, search the database, or track by ID.</div>
 
-  <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:12px">
+  <div class="action-buttons">
     <a class="btn" href="found.html">Report Found Item</a>
     <a class="btn" href="lost.html">Report Lost Item</a>
     <a class="btn secondary" href="search.html">Search Items</a>
@@ -28,5 +39,30 @@
 </main>
 
 <div class="footer">© 2025 Findero. All rights reserved.</div>
+
+<script type="module">
+import { auth, onAuthStateChanged } from './scripts/firebase.js';
+
+onAuthStateChanged(auth, user => {
+  const authLinks = document.getElementById('authLinks');
+  if(user){
+    // Logged-in view
+    authLinks.innerHTML = `
+      <a class="btn ghost" href="dashboard.html">Dashboard</a>
+      <button id="btnLogout" class="btn ghost">Logout</button>
+    `;
+    document.getElementById('btnLogout').addEventListener('click', async ()=>{
+      await auth.signOut();
+      window.location.href = 'index.html';
+    });
+  } else {
+    // Logged-out view
+    authLinks.innerHTML = `
+      <a class="btn ghost" href="login.html">Login</a>
+      <a class="btn secondary" href="signup.html">Sign Up</a>
+    `;
+  }
+});
+</script>
 </body>
 </html>
