@@ -5,32 +5,32 @@
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Findero — Login</title>
 <link rel="stylesheet" href="assets/styles.css">
+<style>
+  body { font-family: Arial, sans-serif; background-color: #fefefe; color:#333; }
+  .container { max-width:400px; margin:50px auto; padding:24px; border-radius:8px; background:#fff; box-shadow:0 2px 8px rgba(0,0,0,0.1); text-align:center; }
+  img { height:60px; margin-bottom:16px; }
+  h2 { color:#0d47a1; margin-bottom:12px; }
+  input { width:100%; padding:10px; margin:8px 0; border-radius:4px; border:1px solid #ccc; }
+  .btn { width:100%; padding:10px; margin-top:12px; border:none; border-radius:4px; cursor:pointer; font-weight:500; }
+  .btn.primary { background-color:#0d47a1; color:white; }
+  .btn.secondary { background-color:#ff9800; color:white; margin-top:8px; }
+  label { display:flex; align-items:center; justify-content:space-between; font-size:0.9rem; }
+</style>
 </head>
 <body>
-<header><img src="assets/logo.png" alt="Findero Logo"></header>
-
-<main class="container card">
-  <div class="title">Login</div>
-  <div class="small">Enter your account details</div>
-
-  <label>Email</label>
-  <input id="email" class="form-control" type="email" placeholder="you@example.com">
-
-  <label>Password</label>
-  <input id="password" class="form-control" type="password" placeholder="Password">
-  <div style="margin-top:8px"><input id="togglePass" type="checkbox"> <span class="small">Show password</span></div>
-
-  <div style="margin-top:14px">
-    <button id="loginBtn" class="btn">Login</button>
-    <a href="signup.html" class="btn ghost" style="margin-left:8px">Sign up</a>
+  <div class="container">
+    <img src="assets/logo.png" alt="Findero Logo">
+    <h2>Login to Findero</h2>
+    <input type="email" id="email" placeholder="Email">
+    <input type="password" id="password" placeholder="Password">
+    <label><span>Show Password</span><input type="checkbox" id="togglePass"></label>
+    <button class="btn primary" id="loginBtn">Login</button>
+    <a class="btn secondary" href="signup.html">Sign Up</a>
   </div>
-</main>
 
-<div class="footer">© 2025 Findero. All rights reserved.</div>
-
-<script type="module">
-  import { initLogin } from './scripts/auth.js';
-  initLogin();
-</script>
+  <script type="module">
+    import { initLogin } from './scripts/auth.js';
+    initLogin();
+  </script>
 </body>
 </html>
