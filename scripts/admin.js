@@ -1,98 +1,60 @@
-// ===== Firebase Config =====
-const firebaseConfig = {
-  apiKey: "YOUR_API_KEY", // Replace with your Firebase API key
-  authDomain: "findero-39098.firebaseapp.com",
-  projectId: "findero-39098",
-  storageBucket: "findero-39098.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
-};
+// admin.js
 
-// Initialize Firebase
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.firestore();
-const storage = firebase.storage();
-
-// ===== Admin Credentials =====
 const ADMIN_EMAIL = "jowialchemystudios@gmail.com";
 
-// ===== Elements =====
+const loginBtn = document.getElementById("login-btn");
+const email = document.getElementById("email");
+const password = document.getElementById("password");
+const error = document.getElementById("login-error");
+
 const loginSection = document.getElementById("login-section");
 const dashboardSection = document.getElementById("dashboard-section");
-const loginBtn = document.getElementById("login-btn");
-const logoutBtn = document.getElementById("logout-btn");
-const emailInput = document.getElementById("email");
-const passwordInput = document.getElementById("password");
-const loginError = document.getElementById("login-error");
-const reportsTableBody = document.querySelector("#reports-table tbody");
 
-// ===== Login =====
-loginBtn.addEventListener("click", () => {
-  const email = emailInput.value;
-  const password = passwordInput.value;
-
-  auth.signInWithEmailAndPassword(email, password)
-    .then(userCredential => {
-      const user = userCredential.user;
-      if(user.email !== ADMIN_EMAIL){
-        loginError.textContent = "Not authorized as admin!";
+loginBtn.onclick = () => {
+  auth.signInWithEmailAndPassword(email.value, password.value)
+    .then((userCred) => {
+      if (userCred.user.email !== ADMIN_EMAIL) {
+        error.innerText = "Not authorized";
         auth.signOut();
-      } else {
-        loginSection.style.display = "none";
-        dashboardSection.style.display = "block";
-        loadReports();
+        return;
       }
+
+      loginSection.style.display = "none";
+      dashboardSection.style.display = "block";
+      loadItems();
     })
-    .catch(error => {
-      loginError.textContent = error.message;
-    });
-});
+    .catch(err => error.innerText = err.message);
+};
 
-// ===== Logout =====
-logoutBtn.addEventListener("click", () => {
-  auth.signOut();
-  dashboardSection.style.display = "none";
-  loginSection.style.display = "block";
-});
+// LOAD ITEMS
+function loadItems() {
+  db.collection("items").onSnapshot(snapshot => {
+    const table = document.getElementById("tbody");
+    table.innerHTML = "";
 
-// ===== Load Reports =====
-function loadReports() {
-  db.collection("items").orderBy("date", "desc").onSnapshot(snapshot => {
-    reportsTableBody.innerHTML = ""; // clear table
     snapshot.forEach(doc => {
       const data = doc.data();
-      const tr = document.createElement("tr");
 
-      tr.innerHTML = `
-        <td>${doc.id}</td>
-        <td>${data.userEmail || "Unknown"}</td>
-        <td>${data.type}</td>
-        <td>${data.description}</td>
-        <td>${data.image ? `<img src="${data.image}" width="100">` : "No image"}</td>
-        <td>${data.status || "Pending"}</td>
-        <td>
-          <button onclick="updateStatus('${doc.id}','Found')">Mark Found</button>
-          <button onclick="deleteReport('${doc.id}')">Delete</button>
-        </td>
+      table.innerHTML += `
+        <tr>
+          <td>${data.type}</td>
+          <td>${data.description}</td>
+          <td><img src="${data.image}" width="80"></td>
+          <td>${data.status || "Pending"}</td>
+          <td>
+            <button onclick="markFound('${doc.id}')">Found</button>
+            <button onclick="deleteItem('${doc.id}')">Delete</button>
+          </td>
+        </tr>
       `;
-      reportsTableBody.appendChild(tr);
     });
   });
 }
 
-// ===== Update Status =====
-function updateStatus(id, status) {
-  db.collection("items").doc(id).update({status: status})
-    .then(() => alert("Status updated!"))
-    .catch(err => alert(err.message));
+function markFound(id){
+  db.collection("items").doc(id).update({status:"Found"});
 }
 
-// ===== Delete Report =====
-function deleteReport(id) {
-  if(confirm("Are you sure you want to delete this report?")){
-    db.collection("items").doc(id).delete()
-      .then(() => alert("Deleted!"))
-      .catch(err => alert(err.message));
-  }
+function deleteItem(id){
+  db.collection("items").doc(id).delete();
 }
