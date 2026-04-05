@@ -3,88 +3,92 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Sign Up — Findero</title>
+<title>Create Account — Findero</title>
+
 <link rel="stylesheet" href="assets/styles.css">
 
 <style>
-/* Centered layout */
-.auth-wrapper {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 90vh;
+/* PAGE */
+body {
+  font-family: Arial, sans-serif;
+  background:#f5f5f5;
+  margin:0;
 }
 
-/* Card */
-.auth-card {
-  width: 100%;
-  max-width: 400px;
-  background: white;
-  padding: 28px;
-  border-radius: 14px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-  text-align: center;
+/* HEADER */
+header {
+  text-align:center;
+  padding:20px;
+  background:#1976d2;
 }
 
-/* Logo */
-.auth-card img {
-  height: 90px;
-  margin-bottom: 10px;
-  filter: drop-shadow(0 0 10px rgba(255,255,255,0.7))
-          drop-shadow(0 0 6px rgba(0,0,0,0.2));
+header img {
+  height:90px;
+  filter: drop-shadow(0 0 10px rgba(255,255,255,0.7));
 }
 
-/* Title */
-.auth-title {
-  font-size: 22px;
-  font-weight: bold;
-  margin-bottom: 6px;
-  color: #0d47a1;
+/* CARD */
+.form-container {
+  max-width:420px;
+  margin:40px auto;
+  background:white;
+  padding:25px;
+  border-radius:12px;
+  box-shadow:0 10px 25px rgba(0,0,0,0.1);
 }
 
-.auth-subtitle {
-  font-size: 14px;
-  color: #666;
-  margin-bottom: 20px;
+/* TEXT */
+.title {
+  text-align:center;
+  font-size:22px;
+  font-weight:bold;
+  color:#0d47a1;
 }
 
-/* Inputs */
-.auth-card input {
-  width: 100%;
-  padding: 12px;
-  margin: 10px 0;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  font-size: 14px;
+.subtitle {
+  text-align:center;
+  font-size:14px;
+  color:#666;
+  margin-bottom:20px;
 }
 
-/* Button */
-.auth-btn {
-  width: 100%;
-  padding: 12px;
-  background: #ff9800;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-weight: bold;
-  cursor: pointer;
-  margin-top: 10px;
+/* INPUTS */
+input {
+  width:100%;
+  padding:12px;
+  margin:8px 0;
+  border-radius:6px;
+  border:1px solid #ccc;
+  font-size:14px;
 }
 
-.auth-btn:hover {
-  background: #e68900;
+/* BUTTON */
+button {
+  width:100%;
+  padding:12px;
+  background:#ff9800;
+  color:white;
+  border:none;
+  border-radius:6px;
+  font-weight:bold;
+  margin-top:10px;
+  cursor:pointer;
 }
 
-/* Link */
-.auth-link {
-  margin-top: 14px;
-  font-size: 14px;
+button:hover {
+  background:#e68900;
 }
 
-.auth-link a {
-  color: #1976d2;
-  text-decoration: none;
-  font-weight: bold;
+/* LINK */
+.link {
+  text-align:center;
+  margin-top:15px;
+}
+
+.link a {
+  color:#1976d2;
+  text-decoration:none;
+  font-weight:bold;
 }
 </style>
 
@@ -93,47 +97,65 @@
 <body>
 
 <header>
-  <img src="assets/logo.png" alt="Findero Logo">
+  <img src="assets/logo.png" alt="Logo">
 </header>
 
-<div class="auth-wrapper">
-  <div class="auth-card">
+<div class="form-container">
 
-    <img src="assets/logo.png" alt="Logo">
+  <div class="title">Create Account</div>
+  <div class="subtitle">Join Findero and start tracking items</div>
 
-    <div class="auth-title">Create Account</div>
-    <div class="auth-subtitle">Join Findero and start tracking items</div>
+  <input type="text" id="name" placeholder="Full Name">
+  <input type="email" id="email" placeholder="Email Address">
+  <input type="tel" id="phone" placeholder="Phone Number">
 
-    <input type="email" id="email" placeholder="Email address">
-    <input type="password" id="password" placeholder="Password">
+  <input type="password" id="password" placeholder="Password">
+  <input type="password" id="confirmPassword" placeholder="Confirm Password">
 
-    <button class="auth-btn" id="signupBtn">Sign Up</button>
+  <button id="signupBtn">Sign Up</button>
 
-    <div class="auth-link">
-      Already have an account? <a href="login.html">Login</a>
-    </div>
-
+  <div class="link">
+    Already have an account? <a href="login.html">Login</a>
   </div>
-</div>
 
-<div class="footer">© 2025 Findero. All rights reserved.</div>
+</div>
 
 <script type="module">
 import { signUp } from './scripts/auth.js';
+import { db } from './scripts/firebase.js';
+import { doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-document.getElementById('signupBtn').addEventListener('click', async () => {
-  const email = document.getElementById('email').value.trim();
-  const password = document.getElementById('password').value;
+document.getElementById("signupBtn").addEventListener("click", async () => {
+  const name = document.getElementById("name").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const phone = document.getElementById("phone").value.trim();
+  const password = document.getElementById("password").value;
+  const confirmPassword = document.getElementById("confirmPassword").value;
 
-  if(!email || !password){
+  if(!name || !email || !phone || !password || !confirmPassword){
     alert("Please fill all fields");
     return;
   }
 
+  if(password !== confirmPassword){
+    alert("Passwords do not match");
+    return;
+  }
+
   try {
-    await signUp(email, password);
+    const userCredential = await signUp(email, password);
+
+    // 🔥 Save extra user data to Firestore
+    await setDoc(doc(db, "users", userCredential.user.uid), {
+      name: name,
+      email: email,
+      phone: phone,
+      createdAt: new Date()
+    });
+
     alert("Account created successfully!");
     window.location.href = "dashboard.html";
+
   } catch(err){
     alert(err.message);
   }
