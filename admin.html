@@ -3,54 +3,36 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Findero — Admin Dashboard</title>
+<title>Findero Admin Login</title>
 <link rel="stylesheet" href="assets/styles.css">
 <style>
-  table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-  th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-  th { background-color: #f4f4f4; }
-  img { max-width: 80px; height: auto; border-radius: 4px; }
-  .status-btn { cursor: pointer; padding: 4px 8px; border-radius: 4px; border: none; }
-  .Pending { background-color: #ff9800; color: white; }
-  .Claimed { background-color: #4caf50; color: white; }
-  #searchBox { width: 100%; padding: 8px; margin: 12px 0; border-radius: 4px; border: 1px solid #ccc; }
+  body { font-family: Arial, sans-serif; background:#fefefe; color:#333; margin:0; display:flex; justify-content:center; align-items:center; height:100vh; }
+  header { text-align:center; margin-bottom:24px; }
+  header img { height:90px; filter: drop-shadow(0 0 8px rgba(255,255,255,0.7)) drop-shadow(0 0 6px rgba(0,0,0,0.2)); }
+  .login-container { background:white; padding:32px; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.2); width:100%; max-width:400px; text-align:center; }
+  .login-container h1 { margin-bottom:16px; color:#0d47a1; }
+  .login-container input { width:100%; padding:10px; margin-bottom:12px; border-radius:6px; border:1px solid #ccc; font-size:1rem; }
+  .login-container button { width:100%; padding:10px; border:none; border-radius:6px; background:#ff9800; color:white; font-size:1rem; font-weight:600; cursor:pointer; }
+  .login-container button:hover { background:#fb8c00; }
+  .login-container small { display:block; margin-top:12px; font-size:0.85rem; color:#555; }
 </style>
 </head>
 <body>
-<header>
-  <img src="assets/logo.png" alt="Findero Logo" style="height:50px;">
-  <div>
-    <button id="btnLogout" class="btn ghost">Logout</button>
-  </div>
-</header>
 
-<main class="container">
-  <div class="title">Admin Dashboard</div>
-  <div class="subtitle">Manage all reported items</div>
+<div class="login-container">
+  <header>
+    <img src="assets/logo.png" alt="Findero Logo">
+  </header>
 
-  <!-- Search box -->
-  <input type="text" id="searchBox" placeholder="Search by Name, Type, Location, or Status">
+  <h1>Admin Login</h1>
 
-  <table id="itemsTable">
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-        <th>Location</th>
-        <th>Date</th>
-        <th>Image</th>
-        <th>Status</th>
-      </tr>
-    </thead>
-    <tbody>
-      <!-- Items will be populated here -->
-    </tbody>
-  </table>
-</main>
-
-<div class="footer">© 2025 Findero. All rights reserved.</div>
+  <input type="email" id="email" placeholder="Email" value="jowialchemystudios@gmail.com">
+  <input type="password" id="password" placeholder="Password" value="Anthony24732#">
+  
+  <button id="loginBtn">Login</button>
+  
+  <small>Don't have an account? Contact owner to create one.</small>
+</div>
 
 <script type="module" src="scripts/admin.js"></script>
 </body>
