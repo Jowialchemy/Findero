@@ -4,65 +4,96 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Track Item — Findero</title>
+
 <link rel="stylesheet" href="assets/styles.css">
+
+<style>
+.track-box {
+  max-width: 400px;
+  margin: 30px auto;
+  text-align:center;
+}
+
+.track-box input {
+  width:100%;
+  padding:12px;
+  border-radius:6px;
+  border:1px solid #ccc;
+}
+
+.result {
+  margin-top:20px;
+}
+</style>
+
 </head>
+
 <body>
+
 <header>
-  <img src="assets/logo.png" alt="Findero Logo">
-  <div>
-    <a class="btn ghost" href="dashboard.html">Dashboard</a>
-    <button id="btnLogout" class="btn ghost">Logout</button>
-  </div>
+  <img src="assets/logo.png">
 </header>
 
 <main class="container">
-  <div class="title">Track Item</div>
-  <div class="subtitle">Lookup by item ID</div>
 
-  <input type="text" id="trackInput" placeholder="Enter Item ID" style="margin-bottom:12px">
-  <button class="btn secondary" id="trackBtn">Track</button>
-  <div id="trackResult" class="results-grid" style="margin-top:12px"></div>
+  <div class="title">Track Item</div>
+  <div class="subtitle">Enter your tracking ID to check status</div>
+
+  <div class="track-box">
+    <input type="text" id="trackInput" placeholder="Enter Tracking ID">
+    <br><br>
+    <button class="btn orange" onclick="trackItem()">Track</button>
+  </div>
+
+  <div id="result" class="result"></div>
+
 </main>
 
 <div class="footer">© 2025 Findero. All rights reserved.</div>
 
-<script type="module">
-import { protectPage, db } from './scripts/items.js';
-import { initLogoutButton } from './scripts/auth.js';
-import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+<script src="scripts/firebase.js"></script>
 
-protectPage(true);
-initLogoutButton();
+<script>
+function trackItem(){
+  const id = document.getElementById("trackInput").value.trim().toUpperCase();
+  const resultDiv = document.getElementById("result");
 
-const input = document.getElementById('trackInput');
-const btn = document.getElementById('trackBtn');
-const resultDiv = document.getElementById('trackResult');
-
-btn.addEventListener('click', async () => {
-  const id = input.value.trim();
-  resultDiv.innerHTML = "";
-
-  if(!id){ alert("Please enter an Item ID"); return; }
-
-  const docRef = doc(db, "items", id);
-  const docSnap = await getDoc(docRef);
-
-  if(docSnap.exists()){
-    const data = docSnap.data();
-    const div = document.createElement('div');
-    div.className = 'card';
-    div.innerHTML = `
-      <div><strong>Type:</strong> ${data.type}</div>
-      <div><strong>Description:</strong> ${data.description}</div>
-      ${data.image ? `<img src="${data.image}" style="width:100%;margin-top:6px;border-radius:4px">` : ""}
-      <div><strong>Status:</strong> ${data.status}</div>
-      <div><strong>Date:</strong> ${new Date(data.date.seconds*1000).toLocaleString()}</div>
-    `;
-    resultDiv.appendChild(div);
-  } else {
-    resultDiv.innerHTML = `<div class="card">No item found with this ID.</div>`;
+  if(!id){
+    alert("Enter tracking ID");
+    return;
   }
-});
+
+  resultDiv.innerHTML = "Searching...";
+
+  db.collection("items").get().then(snapshot => {
+
+    let found = null;
+
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      if(data.trackingID === id){
+        found = data;
+      }
+    });
+
+    if(!found){
+      resultDiv.innerHTML = "<p>No item found</p>";
+      return;
+    }
+
+    resultDiv.innerHTML = `
+      <div class="card">
+        <strong>${found.name}</strong><br>
+        Type: ${found.type}<br>
+        Location: ${found.location}<br>
+        Status: ${found.status}<br>
+        <p>${found.description}</p>
+        ${found.image ? `<img src="${found.image}" width="100%">` : ""}
+      </div>
+    `;
+  });
+}
 </script>
+
 </body>
 </html>
