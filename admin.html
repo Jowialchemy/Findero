@@ -3,27 +3,29 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Findero Admin Login</title>
+<title>Findero — Admin Login</title>
 <link rel="stylesheet" href="assets/styles.css">
+<style>
+  body { font-family: Arial, sans-serif; background:#fefefe; margin:0; color:#333; display:flex; justify-content:center; align-items:center; height:100vh; }
+  .login-container { background:#fff; padding:24px; border-radius:10px; box-shadow:0 4px 12px rgba(0,0,0,0.15); width:100%; max-width:400px; text-align:center; }
+  .login-container img { height:90px; margin-bottom:16px; filter: drop-shadow(0 0 8px rgba(255,255,255,0.7)) drop-shadow(0 0 6px rgba(0,0,0,0.2)); }
+  h2 { margin-bottom:12px; color:#0d47a1; }
+  input { width:100%; padding:10px 12px; margin:6px 0; border-radius:4px; border:1px solid #ccc; font-size:1rem; }
+  button { width:100%; padding:12px; margin-top:12px; border:none; border-radius:4px; background:#ff9800; color:white; font-weight:600; cursor:pointer; font-size:1rem; }
+  button:hover { background:#fb8c00; }
+  .footer { text-align:center; margin-top:12px; font-size:0.85rem; color:#666; }
+</style>
 </head>
 <body>
-<header style="background:#555; color:white; display:flex;align-items:center; padding:12px 24px;">
-  <img src="assets/logo.png" alt="Findero Logo" style="height:90px; filter: drop-shadow(0 0 8px rgba(255,255,255,0.7)) drop-shadow(0 0 6px rgba(0,0,0,0.2));">
-  <h1 style="margin-left:12px;">Findero Admin Login</h1>
-</header>
+<div class="login-container">
+  <img src="assets/logo.png" alt="Findero Logo">
+  <h2>Admin Login</h2>
+  <input type="email" id="email" placeholder="Email" value="jowialchemystudios@gmail.com">
+  <input type="password" id="password" placeholder="Password" value="Anthony24732#">
+  <button id="loginBtn">Login</button>
+  <div class="footer">© 2025 Findero. All rights reserved.</div>
+</div>
 
-<main class="container" style="padding:24px; text-align:center;">
-  <div class="title">Admin Login</div>
-  <form id="adminLoginForm" style="margin-top:16px; display:flex; flex-direction:column; align-items:center; gap:12px;">
-    <input id="adminEmail" type="email" placeholder="Email" style="padding:8px;width:250px;">
-    <input id="adminPassword" type="password" placeholder="Password" style="padding:8px;width:250px;">
-    <button id="adminLoginBtn" class="btn secondary" type="submit">Login</button>
-  </form>
-</main>
-
-<script type="module">
-import { initAdminLogin } from './scripts/admin.js';
-initAdminLogin();
-</script>
+<script type="module" src="scripts/admin.js"></script>
 </body>
 </html>
