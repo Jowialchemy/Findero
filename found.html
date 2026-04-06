@@ -4,36 +4,147 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Report Found Item — Findero</title>
+
 <link rel="stylesheet" href="assets/styles.css">
+
+<style>
+.form-box {
+  max-width: 500px;
+  margin: 40px auto;
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.file-input {
+  border: 2px dashed #ccc;
+  padding: 18px;
+  border-radius: 10px;
+  text-align: center;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+
+.file-input:hover {
+  border-color: #ff9800;
+  background: #fff8f0;
+}
+
+.preview {
+  width: 100%;
+  border-radius: 8px;
+  margin-top: 10px;
+}
+
+textarea {
+  height: 90px;
+  resize: none;
+}
+</style>
+
 </head>
+
 <body>
+
 <header>
-  <img src="assets/logo.png" alt="Findero Logo">
-  <div>
-    <a class="btn ghost" href="dashboard.html">Dashboard</a>
-    <button id="btnLogout" class="btn ghost">Logout</button>
-  </div>
+  <img src="assets/logo.png">
 </header>
 
 <main class="container">
-  <div class="title">Report Found Item</div>
-  <div class="subtitle">Submit items you found so owners can claim them</div>
 
-  <form id="foundForm">
-    <input type="file" name="image" required>
-    <input type="text" name="desc" placeholder="Description" required>
-    <button type="button" class="btn secondary" onclick="submitItem('found', 'foundForm')">Submit</button>
-  </form>
+  <div class="title">Report Found Item</div>
+  <div class="subtitle">Help the rightful owner recover their item</div>
+
+  <div class="form-box">
+
+    <!-- ITEM NAME -->
+    <input type="text" id="name" placeholder="Item Name (e.g. iPhone 13)">
+
+    <!-- LOCATION -->
+    <input type="text" id="location" placeholder="Where did you find it?">
+
+    <!-- DESCRIPTION -->
+    <textarea id="desc" placeholder="Describe the item (color, condition, etc)"></textarea>
+
+    <!-- SECRET DETAIL -->
+    <textarea id="secret" placeholder="Secret detail (ONLY owner should know)"></textarea>
+
+    <!-- IMAGE -->
+    <label class="file-input">
+      Click to upload image
+      <input type="file" id="image" hidden>
+    </label>
+
+    <img id="preview" class="preview" style="display:none">
+
+    <!-- SUBMIT -->
+    <button class="btn orange" onclick="submitItem()">
+      Submit Item
+    </button>
+
+  </div>
+
 </main>
 
 <div class="footer">© 2025 Findero. All rights reserved.</div>
 
-<script type="module">
-import { initLogoutButton } from './scripts/auth.js';
-import { protectPage, submitItem } from './scripts/items.js';
+<script src="scripts/firebase.js"></script>
 
-protectPage(true);
-initLogoutButton();
+<script>
+const fileInput = document.getElementById("image");
+const preview = document.getElementById("preview");
+
+fileInput.addEventListener("change", () => {
+  const file = fileInput.files[0];
+  if(file){
+    preview.src = URL.createObjectURL(file);
+    preview.style.display = "block";
+  }
+});
+
+// 🔥 GENERATE TRACKING ID
+function generateID(){
+  return "FD-" + Math.random().toString(36).substring(2,8).toUpperCase();
+}
+
+function submitItem(){
+  const name = document.getElementById("name").value;
+  const location = document.getElementById("location").value;
+  const desc = document.getElementById("desc").value;
+  const secret = document.getElementById("secret").value;
+  const file = fileInput.files[0];
+
+  if(!name || !location || !desc || !secret || !file){
+    alert("Please fill all fields");
+    return;
+  }
+
+  const trackingID = generateID();
+
+  const ref = storage.ref("found_items/" + Date.now());
+
+  ref.put(file).then(() => {
+    ref.getDownloadURL().then(url => {
+
+      db.collection("items").add({
+        type: "found",
+        name: name,
+        location: location,
+        description: desc,
+        secret: secret, // 🔐 hidden verification
+        image: url,
+        trackingID: trackingID,
+        status: "Pending",
+        date: new Date()
+      });
+
+      alert("Item submitted! Tracking ID: " + trackingID);
+      window.location.href = "dashboard.html";
+    });
+  });
+}
 </script>
+
 </body>
 </html>
