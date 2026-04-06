@@ -4,36 +4,115 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Report Lost Item — Findero</title>
+
 <link rel="stylesheet" href="assets/styles.css">
+
+<style>
+.form-box {
+  max-width: 500px;
+  margin: 40px auto;
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+textarea {
+  height: 90px;
+  resize: none;
+}
+</style>
+
 </head>
+
 <body>
+
 <header>
-  <img src="assets/logo.png" alt="Findero Logo">
-  <div>
-    <a class="btn ghost" href="dashboard.html">Dashboard</a>
-    <button id="btnLogout" class="btn ghost">Logout</button>
-  </div>
+  <img src="assets/logo.png">
 </header>
 
 <main class="container">
-  <div class="title">Report Lost Item</div>
-  <div class="subtitle">Tell us what you lost so others can search</div>
 
-  <form id="lostForm">
-    <input type="file" name="image" required>
-    <input type="text" name="desc" placeholder="Description" required>
-    <button type="button" class="btn secondary" onclick="submitItem('lost', 'lostForm')">Submit</button>
-  </form>
+  <div class="title">Report Lost Item</div>
+  <div class="subtitle">Tell us what you lost so it can be found</div>
+
+  <div class="form-box">
+
+    <input type="text" id="name" placeholder="Item Name (e.g. Wallet, Phone)">
+
+    <input type="text" id="location" placeholder="Where did you lose it?">
+
+    <input type="date" id="date">
+
+    <textarea id="desc" placeholder="Describe the item"></textarea>
+
+    <textarea id="proof" placeholder="Proof of ownership (unique detail only you know)"></textarea>
+
+    <input type="text" id="contact" placeholder="Your contact (phone or email)">
+
+    <input type="file" id="image">
+
+    <button class="btn orange" onclick="submitLost()">
+      Submit Lost Item
+    </button>
+
+  </div>
+
 </main>
 
 <div class="footer">© 2025 Findero. All rights reserved.</div>
 
-<script type="module">
-import { initLogoutButton } from './scripts/auth.js';
-import { protectPage, submitItem } from './scripts/items.js';
+<script src="scripts/firebase.js"></script>
 
-protectPage(true);
-initLogoutButton();
+<script>
+function generateID(){
+  return "LS-" + Math.random().toString(36).substring(2,8).toUpperCase();
+}
+
+function submitLost(){
+  const name = document.getElementById("name").value;
+  const location = document.getElementById("location").value;
+  const date = document.getElementById("date").value;
+  const desc = document.getElementById("desc").value;
+  const proof = document.getElementById("proof").value;
+  const contact = document.getElementById("contact").value;
+  const file = document.getElementById("image").files[0];
+
+  if(!name || !location || !date || !desc || !proof || !contact){
+    alert("Please fill all required fields");
+    return;
+  }
+
+  const trackingID = generateID();
+
+  let uploadPromise = Promise.resolve("");
+
+  if(file){
+    const ref = storage.ref("lost_items/" + Date.now());
+    uploadPromise = ref.put(file).then(() => ref.getDownloadURL());
+  }
+
+  uploadPromise.then(url => {
+
+    db.collection("items").add({
+      type: "lost",
+      name: name,
+      location: location,
+      dateLost: date,
+      description: desc,
+      proof: proof, // 🔐 owner verification
+      contact: contact,
+      image: url,
+      trackingID: trackingID,
+      status: "Searching",
+      createdAt: new Date()
+    });
+
+    alert("Lost item reported! Tracking ID: " + trackingID);
+    window.location.href = "dashboard.html";
+  });
+}
 </script>
+
 </body>
 </html>
