@@ -4,64 +4,136 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Search Items — Findero</title>
+
 <link rel="stylesheet" href="assets/styles.css">
+
+<style>
+.search-box {
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-top:20px;
+}
+
+.search-box input, .search-box select {
+  padding:10px;
+  border-radius:6px;
+  border:1px solid #ccc;
+}
+
+.results-grid {
+  margin-top:20px;
+}
+
+.card img {
+  width:100%;
+  border-radius:8px;
+  margin-top:8px;
+}
+</style>
+
 </head>
+
 <body>
+
 <header>
-  <img src="assets/logo.png" alt="Findero Logo">
-  <div>
-    <a class="btn ghost" href="dashboard.html">Dashboard</a>
-    <button id="btnLogout" class="btn ghost">Logout</button>
-  </div>
+  <img src="assets/logo.png">
 </header>
 
 <main class="container">
-  <div class="title">Search Items</div>
-  <div class="subtitle">Search across all found and lost items</div>
 
-  <input type="text" id="searchInput" placeholder="Enter keyword..." style="margin-bottom:12px">
+  <div class="title">Search Items</div>
+  <div class="subtitle">Find lost or found items easily</div>
+
+  <!-- SEARCH CONTROLS -->
+  <div class="search-box">
+    <input type="text" id="searchInput" placeholder="Search item name...">
+
+    <select id="typeFilter">
+      <option value="">All</option>
+      <option value="lost">Lost</option>
+      <option value="found">Found</option>
+    </select>
+
+    <input type="text" id="locationFilter" placeholder="Filter by location">
+  </div>
+
+  <!-- RESULTS -->
   <div id="results" class="results-grid"></div>
+
 </main>
 
 <div class="footer">© 2025 Findero. All rights reserved.</div>
 
-<script type="module">
-import { protectPage, db } from './scripts/items.js';
-import { initLogoutButton } from './scripts/auth.js';
-import { collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+<script src="scripts/firebase.js"></script>
 
-protectPage(true);
-initLogoutButton();
+<script>
+const searchInput = document.getElementById("searchInput");
+const typeFilter = document.getElementById("typeFilter");
+const locationFilter = document.getElementById("locationFilter");
+const resultsDiv = document.getElementById("results");
 
-const input = document.getElementById('searchInput');
-const resultsDiv = document.getElementById('results');
-
-input.addEventListener('input', async () => {
-  const keyword = input.value.toLowerCase();
+function renderItems(items){
   resultsDiv.innerHTML = "";
 
-  if(!keyword) return;
+  if(items.length === 0){
+    resultsDiv.innerHTML = "<p>No items found</p>";
+    return;
+  }
 
-  // Fetch all items
-  const snapshot = await getDocs(collection(db, "items"));
-  snapshot.forEach(doc => {
-    const data = doc.data();
-    if((data.description && data.description.toLowerCase().includes(keyword)) || 
-       (data.type && data.type.toLowerCase().includes(keyword))) {
-
-      const div = document.createElement('div');
-      div.className = 'card';
-      div.innerHTML = `
-        <div><strong>Type:</strong> ${data.type}</div>
-        <div><strong>Description:</strong> ${data.description}</div>
-        ${data.image ? `<img src="${data.image}" style="width:100%;margin-top:6px;border-radius:4px">` : ""}
-        <div><strong>Status:</strong> ${data.status}</div>
-        <div><strong>Date:</strong> ${new Date(data.date.seconds*1000).toLocaleString()}</div>
-      `;
-      resultsDiv.appendChild(div);
-    }
+  items.forEach(item => {
+    resultsDiv.innerHTML += `
+      <div class="card">
+        <strong>${item.name || "Unnamed Item"}</strong><br>
+        Type: ${item.type}<br>
+        Location: ${item.location || "N/A"}<br>
+        Status: ${item.status}<br>
+        Tracking ID: ${item.trackingID || "N/A"}
+        <p>${item.description || ""}</p>
+        ${item.image ? `<img src="${item.image}">` : ""}
+      </div>
+    `;
   });
-});
+}
+
+// 🔥 LOAD + FILTER DATA
+function loadItems(){
+  db.collection("items").orderBy("date", "desc").onSnapshot(snapshot => {
+    let items = [];
+
+    snapshot.forEach(doc => {
+      items.push(doc.data());
+    });
+
+    applyFilters(items);
+  });
+}
+
+function applyFilters(items){
+  const text = searchInput.value.toLowerCase();
+  const type = typeFilter.value;
+  const location = locationFilter.value.toLowerCase();
+
+  const filtered = items.filter(item => {
+
+    return (
+      (!text || (item.name || "").toLowerCase().includes(text)) &&
+      (!type || item.type === type) &&
+      (!location || (item.location || "").toLowerCase().includes(location))
+    );
+
+  });
+
+  renderItems(filtered);
+}
+
+// 🔁 LIVE SEARCH
+searchInput.addEventListener("input", applyFilters);
+typeFilter.addEventListener("change", applyFilters);
+locationFilter.addEventListener("input", applyFilters);
+
+loadItems();
 </script>
+
 </body>
 </html>
