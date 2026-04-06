@@ -1,29 +1,48 @@
 // scripts/admin.js
-import { auth } from './firebase.js';
-import { signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { auth } from "./firebase.js";
+import { signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-// Redirect logged-in admins directly to dashboard
-onAuthStateChanged(auth, user => {
-  if(user){
-    window.location.href = 'admin-dashboard.html'; // make sure you have this page
-  }
-});
+// Protect admin page
+export function protectAdminPage() {
+  onAuthStateChanged(auth, (user) => {
+    if (!user) {
+      // Not logged in, redirect to login page
+      window.location.href = "admin.html";
+    }
+  });
+}
 
-const loginBtn = document.getElementById('loginBtn');
+// Admin login form
+export function initAdminLogin() {
+  const loginBtn = document.getElementById("adminLoginBtn");
+  if (!loginBtn) return;
 
-loginBtn.addEventListener('click', async () => {
-  const email = document.getElementById('email').value.trim();
-  const password = document.getElementById('password').value;
+  loginBtn.addEventListener("click", async (e) => {
+    e.preventDefault();
+    const email = document.getElementById("adminEmail").value.trim();
+    const password = document.getElementById("adminPassword").value;
 
-  if(!email || !password){ 
-    alert("Please enter both email and password."); 
-    return; 
-  }
+    if (!email || !password) {
+      alert("Enter email and password");
+      return;
+    }
 
-  try {
-    await signInWithEmailAndPassword(auth, email, password);
-    window.location.href = 'admin-dashboard.html'; // redirect to admin dashboard
-  } catch(err){
-    alert("Login failed: " + err.message);
-  }
-});
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      window.location.href = "dashboard.html";
+    } catch (err) {
+      alert("Login failed: " + err.message);
+    }
+  });
+}
+
+// Admin logout
+export function initAdminLogout() {
+  const logoutBtn = document.getElementById("btnLogout");
+  if (!logoutBtn) return;
+
+  logoutBtn.addEventListener("click", async () => {
+    await signOut(auth);
+    window.location.href = "admin.html";
+  });
+}
