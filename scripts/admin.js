@@ -6,10 +6,9 @@ import {
   signOut
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-// ✅ CHANGE THIS TO YOUR ADMIN EMAIL
 const ADMIN_EMAIL = "jowialchemystudios@gmail.com";
 
-// 🔐 LOGIN FUNCTION
+// 🔐 LOGIN
 const loginBtn = document.getElementById('loginBtn');
 
 if (loginBtn) {
@@ -25,11 +24,11 @@ if (loginBtn) {
     try {
       const userCred = await signInWithEmailAndPassword(auth, email, password);
 
-      // ✅ CHECK IF ADMIN
+      // ✅ ADMIN CHECK
       if (userCred.user.email === ADMIN_EMAIL) {
-        window.location.href = "admin-dashboard.html"; // ✅ ADMIN PAGE
+        window.location.href = "admin-dashboard.html";
       } else {
-        window.location.href = "dashboard.html"; // normal users
+        window.location.href = "dashboard.html";
       }
 
     } catch (err) {
