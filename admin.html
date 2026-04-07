@@ -3,27 +3,107 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Findero Admin Login</title>
+<title>Findero — Admin Login</title>
 <link rel="stylesheet" href="assets/styles.css">
-</head>
-<body style="display:flex;justify-content:center;align-items:center;height:100vh;background:#f5f5f5;">
 
-<div style="background:#fff;padding:30px;border-radius:10px;box-shadow:0 4px 10px rgba(0,0,0,0.2);width:350px;text-align:center;">
-  
-  <img src="assets/logo.png" style="height:90px;margin-bottom:15px;
-  filter: drop-shadow(0 0 8px rgba(255,255,255,0.7)) drop-shadow(0 0 6px rgba(0,0,0,0.2));">
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #f5f5f5;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+
+  .login-box {
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 10px;
+    width: 100%;
+    max-width: 380px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+    text-align: center;
+  }
+
+  .logo {
+    height: 90px;
+    margin-bottom: 15px;
+    filter: drop-shadow(0 0 8px rgba(255,255,255,0.7))
+            drop-shadow(0 0 6px rgba(0,0,0,0.2));
+  }
+
+  h2 {
+    margin-bottom: 10px;
+    color: #0d47a1;
+  }
+
+  p {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 20px;
+  }
+
+  input {
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+  }
+
+  input:focus {
+    outline: none;
+    border-color: #1976d2;
+  }
+
+  button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 12px;
+    background: #ff9800;
+    border: none;
+    border-radius: 6px;
+    color: white;
+    font-weight: bold;
+    font-size: 1rem;
+    cursor: pointer;
+  }
+
+  button:hover {
+    background: #fb8c00;
+  }
+
+  .footer {
+    margin-top: 15px;
+    font-size: 0.8rem;
+    color: #888;
+  }
+</style>
+</head>
+
+<body>
+
+<div class="login-box">
+
+  <img src="assets/logo.png" alt="Findero Logo" class="logo">
 
   <h2>Admin Login</h2>
+  <p>Access the Findero control panel</p>
 
-  <input id="email" type="email" placeholder="Email" style="width:100%;padding:10px;margin:10px 0;">
-  <input id="password" type="password" placeholder="Password" style="width:100%;padding:10px;margin:10px 0;">
+  <!-- IMPORTANT: IDs MUST MATCH admin.js -->
+  <input id="email" type="email" placeholder="Admin Email">
+  <input id="password" type="password" placeholder="Password">
 
-  <button id="loginBtn" style="width:100%;padding:12px;background:#ff9800;color:#fff;border:none;border-radius:5px;font-weight:bold;">
-    Login
-  </button>
+  <button id="loginBtn">Login</button>
+
+  <div class="footer">© 2025 Findero. All rights reserved.</div>
 
 </div>
 
+<!-- VERY IMPORTANT -->
 <script type="module" src="scripts/admin.js"></script>
 
 </body>
