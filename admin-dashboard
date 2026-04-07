@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Admin Dashboard</title>
+<link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+
+<header style="background:#555;color:#fff;padding:15px;display:flex;justify-content:space-between;align-items:center;">
+  <h2>Admin Dashboard</h2>
+  <button id="btnLogout" style="padding:8px 12px;background:#ff9800;border:none;color:white;">Logout</button>
+</header>
+
+<main style="padding:20px;text-align:center;">
+  <h3>Welcome Admin 👑</h3>
+  <p>You can now manage all items here.</p>
+</main>
+
+<script type="module">
+import { protectAdminPage, initAdminLogout } from './scripts/admin.js';
+
+protectAdminPage();
+initAdminLogout();
+</script>
+
+</body>
+</html>
