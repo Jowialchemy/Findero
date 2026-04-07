@@ -1,21 +1,19 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Admin Dashboard</title>
 <link rel="stylesheet" href="assets/styles.css">
 </head>
 <body>
 
-<header style="background:#555;color:#fff;padding:15px;display:flex;justify-content:space-between;align-items:center;">
-  <h2>Admin Dashboard</h2>
-  <button id="btnLogout" style="padding:8px 12px;background:#ff9800;border:none;color:white;">Logout</button>
+<header style="background:#555;color:#fff;padding:15px;display:flex;justify-content:space-between;">
+  <h2>Admin Panel</h2>
+  <button id="btnLogout">Logout</button>
 </header>
 
-<main style="padding:20px;text-align:center;">
+<main style="padding:20px;">
   <h3>Welcome Admin 👑</h3>
-  <p>You can now manage all items here.</p>
+  <p>This is your control panel.</p>
 </main>
 
 <script type="module">
