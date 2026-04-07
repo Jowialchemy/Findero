@@ -17,7 +17,7 @@ loginBtn.addEventListener('click', async () => {
     // Firebase Auth login
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
     // Redirect to admin dashboard after successful login
-    window.location.href = 'dashboard.html';
+    window.location.href = 'admin-dashboard.html';
   } catch(error) {
     console.error(error);
     alert("Login failed: " + error.message);
