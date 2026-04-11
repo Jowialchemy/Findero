@@ -1,26 +1,177 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Admin Dashboard</title>
 <link rel="stylesheet" href="assets/styles.css">
+
+<style>
+body { font-family: Arial; margin:0; background:#f5f5f5; }
+
+header {
+  background:#555;
+  color:#fff;
+  padding:15px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.container { padding:20px; }
+
+.search-box {
+  padding:10px;
+  width:100%;
+  max-width:400px;
+  margin-bottom:15px;
+  border-radius:5px;
+  border:1px solid #ccc;
+}
+
+table {
+  width:100%;
+  border-collapse:collapse;
+  background:#fff;
+}
+
+th, td {
+  padding:10px;
+  border-bottom:1px solid #ddd;
+  text-align:left;
+}
+
+th { background:#eee; }
+
+img { width:60px; border-radius:5px; }
+
+button.delete {
+  background:red;
+  color:#fff;
+  border:none;
+  padding:6px 10px;
+  cursor:pointer;
+}
+</style>
 </head>
+
 <body>
 
-<header style="background:#555;color:#fff;padding:15px;display:flex;justify-content:space-between;">
+<header>
   <h2>Admin Panel</h2>
   <button id="btnLogout">Logout</button>
 </header>
 
-<main style="padding:20px;">
-  <h3>Welcome Admin 👑</h3>
-  <p>This is your control panel.</p>
-</main>
+<div class="container">
+
+  <input id="searchInput" class="search-box" placeholder="Search items...">
+
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Location</th>
+        <th>Image</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody id="itemsTable"></tbody>
+  </table>
+
+</div>
 
 <script type="module">
+
 import { protectAdminPage, initAdminLogout } from './scripts/admin.js';
+import { db } from './scripts/firebase.js';
+import {
+  collection,
+  getDocs,
+  deleteDoc,
+  doc
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 protectAdminPage();
 initAdminLogout();
+
+const table = document.getElementById("itemsTable");
+const searchInput = document.getElementById("searchInput");
+
+let allItems = [];
+
+// LOAD DATA
+async function loadItems() {
+  table.innerHTML = "Loading...";
+
+  const foundSnap = await getDocs(collection(db, "foundItems"));
+  const lostSnap = await getDocs(collection(db, "lostItems"));
+
+  allItems = [];
+
+  foundSnap.forEach(docu => {
+    allItems.push({ id: docu.id, type: "Found", ...docu.data() });
+  });
+
+  lostSnap.forEach(docu => {
+    allItems.push({ id: docu.id, type: "Lost", ...docu.data() });
+  });
+
+  render(allItems);
+}
+
+// RENDER TABLE
+function render(items) {
+  table.innerHTML = "";
+
+  if (items.length === 0) {
+    table.innerHTML = "<tr><td colspan='6'>No items found</td></tr>";
+    return;
+  }
+
+  items.forEach(item => {
+    const row = document.createElement("tr");
+
+    row.innerHTML = `
+      <td>${item.type}</td>
+      <td>${item.name || ""}</td>
+      <td>${item.description || ""}</td>
+      <td>${item.location || ""}</td>
+      <td>${item.image ? `<img src="${item.image}">` : ""}</td>
+      <td>
+        <button class="delete">Delete</button>
+      </td>
+    `;
+
+    row.querySelector(".delete").onclick = async () => {
+      if (!confirm("Delete this item?")) return;
+
+      const col = item.type === "Found" ? "foundItems" : "lostItems";
+      await deleteDoc(doc(db, col, item.id));
+
+      loadItems();
+    };
+
+    table.appendChild(row);
+  });
+}
+
+// SEARCH
+searchInput.addEventListener("input", () => {
+  const q = searchInput.value.toLowerCase();
+
+  const filtered = allItems.filter(item =>
+    (item.name || "").toLowerCase().includes(q) ||
+    (item.description || "").toLowerCase().includes(q) ||
+    (item.location || "").toLowerCase().includes(q)
+  );
+
+  render(filtered);
+});
+
+loadItems();
+
 </script>
 
 </body>
