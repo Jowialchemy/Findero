@@ -5,36 +5,115 @@
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Findero — Login</title>
 <link rel="stylesheet" href="assets/styles.css">
-<style>
-  body { font-family: Arial, sans-serif; background-color:#fefefe; color:#333; margin:0; }
-  header { display:flex; justify-content:center; align-items:center; padding:12px 24px; background-color:#1976d2; color:white; box-shadow:0 2px 4px rgba(0,0,0,0.1);}
-  header img { height:90px; filter: drop-shadow(0 0 8px rgba(255,255,255,0.7)) drop-shadow(0 0 6px rgba(0,0,0,0.2)); transition: transform 0.3s ease; }
-  header img:hover { transform: scale(1.05); }
 
-  .container { max-width:400px; margin:36px auto; text-align:center; padding:16px; }
-  .title { font-size:1.8rem; color:#0d47a1; margin-bottom:16px; font-weight:700; }
-  input { width:100%; padding:10px; margin:8px 0; border-radius:4px; border:1px solid #ccc; font-size:1rem; }
-  .btn { width:100%; padding:10px; margin-top:12px; border:none; border-radius:4px; cursor:pointer; font-weight:500; font-size:1rem; }
-  .btn.ghost { background-color:transparent; color:white; border:1px solid white; }
-  .btn.secondary { background-color:#ff9800; color:white; }
+<style>
+body {
+  font-family: Arial;
+  background:#f5f5f5;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+  margin:0;
+}
+
+.box {
+  background:#fff;
+  padding:30px;
+  border-radius:10px;
+  width:100%;
+  max-width:380px;
+  box-shadow:0 6px 18px rgba(0,0,0,0.15);
+  text-align:center;
+}
+
+.logo {
+  height:90px;
+  margin-bottom:15px;
+  filter: drop-shadow(0 0 8px rgba(255,255,255,0.7))
+          drop-shadow(0 0 6px rgba(0,0,0,0.2));
+}
+
+input {
+  width:100%;
+  padding:12px;
+  margin:10px 0;
+  border-radius:6px;
+  border:1px solid #ccc;
+}
+
+.password-box {
+  position:relative;
+}
+
+.toggle {
+  position:absolute;
+  right:10px;
+  top:50%;
+  transform:translateY(-50%);
+  cursor:pointer;
+}
+
+button {
+  width:100%;
+  padding:12px;
+  background:#ff9800;
+  border:none;
+  border-radius:6px;
+  color:#fff;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+button:hover { background:#fb8c00; }
+
+.footer {
+  margin-top:15px;
+  font-size:0.9rem;
+}
 </style>
 </head>
+
 <body>
-<header>
-  <img src="assets/logo.png" alt="Findero Logo">
-</header>
 
-<main class="container">
-  <div class="title">Login</div>
-  <input type="email" id="email" placeholder="Email" required>
-  <input type="password" id="password" placeholder="Password" required>
-  <button id="loginBtn" class="btn secondary">Login</button>
-  <p style="margin-top:12px;">Don't have an account? <a href="signup.html">Sign Up</a></p>
-</main>
+<div class="box">
 
-<script type="module">
-import { initLogin } from './scripts/auth.js';
-initLogin();
+  <img src="assets/logo.png" class="logo">
+
+  <h2>Login</h2>
+
+  <input id="email" type="email" placeholder="Email">
+
+  <div class="password-box">
+    <input id="password" type="password" placeholder="Password">
+    <span id="togglePassword" class="toggle">👁</span>
+  </div>
+
+  <button id="loginBtn">Login</button>
+
+  <div class="footer">
+    Don't have an account? <a href="signup.html">Sign Up</a>
+  </div>
+
+</div>
+
+<script>
+// 👁 SHOW / HIDE PASSWORD
+const password = document.getElementById("password");
+const toggle = document.getElementById("togglePassword");
+
+toggle.addEventListener("click", () => {
+  if (password.type === "password") {
+    password.type = "text";
+    toggle.textContent = "🙈";
+  } else {
+    password.type = "password";
+    toggle.textContent = "👁";
+  }
+});
 </script>
+
+<script type="module" src="scripts/login.js"></script>
+
 </body>
 </html>
