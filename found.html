@@ -3,147 +3,91 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Report Found Item — Findero</title>
-
-<link rel="stylesheet" href="assets/styles.css">
+<title>Report Found Item</title>
 
 <style>
-.form-box {
-  max-width: 500px;
-  margin: 40px auto;
-  background: white;
-  padding: 25px;
-  border-radius: 12px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+body { font-family: Arial; background:#f5f5f5; margin:0; }
+
+.container {
+  max-width:500px;
+  margin:40px auto;
+  background:#fff;
+  padding:25px;
+  border-radius:10px;
 }
 
-.file-input {
-  border: 2px dashed #ccc;
-  padding: 18px;
-  border-radius: 10px;
-  text-align: center;
-  cursor: pointer;
-  margin-bottom: 10px;
+input, textarea {
+  width:100%;
+  padding:10px;
+  margin:10px 0;
+  border-radius:5px;
+  border:1px solid #ccc;
 }
 
-.file-input:hover {
-  border-color: #ff9800;
-  background: #fff8f0;
-}
-
-.preview {
-  width: 100%;
-  border-radius: 8px;
-  margin-top: 10px;
-}
-
-textarea {
-  height: 90px;
-  resize: none;
+button {
+  width:100%;
+  padding:12px;
+  background:#ff9800;
+  border:none;
+  color:#fff;
+  font-weight:bold;
+  cursor:pointer;
 }
 </style>
-
 </head>
 
 <body>
 
-<header>
-  <img src="assets/logo.png">
-</header>
+<div class="container">
 
-<main class="container">
+<h2>Report Found Item</h2>
 
-  <div class="title">Report Found Item</div>
-  <div class="subtitle">Help the rightful owner recover their item</div>
+<input id="name" placeholder="Item Name">
+<input id="location" placeholder="Where you found it">
+<textarea id="description" placeholder="Describe the item"></textarea>
+<input id="image" type="file">
 
-  <div class="form-box">
+<button id="submitBtn">Submit</button>
 
-    <!-- ITEM NAME -->
-    <input type="text" id="name" placeholder="Item Name (e.g. iPhone 13)">
+<p id="status"></p>
 
-    <!-- LOCATION -->
-    <input type="text" id="location" placeholder="Where did you find it?">
+</div>
 
-    <!-- DESCRIPTION -->
-    <textarea id="desc" placeholder="Describe the item (color, condition, etc)"></textarea>
+<script type="module">
+import { db } from "./scripts/firebase.js";
+import { collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-    <!-- SECRET DETAIL -->
-    <textarea id="secret" placeholder="Secret detail (ONLY owner should know)"></textarea>
+const btn = document.getElementById("submitBtn");
+const statusText = document.getElementById("status");
 
-    <!-- IMAGE -->
-    <label class="file-input">
-      Click to upload image
-      <input type="file" id="image" hidden>
-    </label>
+btn.onclick = async () => {
 
-    <img id="preview" class="preview" style="display:none">
-
-    <!-- SUBMIT -->
-    <button class="btn orange" onclick="submitItem()">
-      Submit Item
-    </button>
-
-  </div>
-
-</main>
-
-<div class="footer">© 2025 Findero. All rights reserved.</div>
-
-<script src="scripts/firebase.js"></script>
-
-<script>
-const fileInput = document.getElementById("image");
-const preview = document.getElementById("preview");
-
-fileInput.addEventListener("change", () => {
-  const file = fileInput.files[0];
-  if(file){
-    preview.src = URL.createObjectURL(file);
-    preview.style.display = "block";
-  }
-});
-
-// 🔥 GENERATE TRACKING ID
-function generateID(){
-  return "FD-" + Math.random().toString(36).substring(2,8).toUpperCase();
-}
-
-function submitItem(){
   const name = document.getElementById("name").value;
   const location = document.getElementById("location").value;
-  const desc = document.getElementById("desc").value;
-  const secret = document.getElementById("secret").value;
-  const file = fileInput.files[0];
+  const description = document.getElementById("description").value;
 
-  if(!name || !location || !desc || !secret || !file){
-    alert("Please fill all fields");
+  if(!name || !location){
+    alert("Please fill required fields");
     return;
   }
 
-  const trackingID = generateID();
+  try {
 
-  const ref = storage.ref("found_items/" + Date.now());
-
-  ref.put(file).then(() => {
-    ref.getDownloadURL().then(url => {
-
-      db.collection("items").add({
-        type: "found",
-        name: name,
-        location: location,
-        description: desc,
-        secret: secret, // 🔐 hidden verification
-        image: url,
-        trackingID: trackingID,
-        status: "Pending",
-        date: new Date()
-      });
-
-      alert("Item submitted! Tracking ID: " + trackingID);
-      window.location.href = "dashboard.html";
+    await addDoc(collection(db,"foundItems"), {
+      name,
+      location,
+      description,
+      status: "pending", // ✅ IMPORTANT
+      createdAt: Date.now()
     });
-  });
-}
+
+    statusText.innerText = "Item submitted successfully!";
+    
+  } catch(err){
+    console.error(err);
+    statusText.innerText = "Error submitting item";
+  }
+};
 </script>
 
 </body>
