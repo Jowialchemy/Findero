@@ -14,12 +14,23 @@ body {
 
 /* HEADER */
 header {
-  background:#0d47a1; /* 🔵 BLUE BACK */
+  background:#ff9800; /* 🟠 ORANGE */
   color:#fff;
   padding:15px 20px;
   display:flex;
   justify-content:space-between;
   align-items:center;
+}
+
+/* LOGO */
+.logo {
+  display:flex;
+  align-items:center;
+}
+
+.logo img {
+  height:40px;
+  margin-right:10px;
 }
 
 header a {
@@ -32,15 +43,11 @@ header a {
 /* HERO */
 .hero {
   text-align:center;
-  padding:60px 20px;
+  padding:50px 20px;
 }
 
 .hero h2 {
   font-size:28px;
-}
-
-.hero p {
-  color:#555;
 }
 
 /* CARDS */
@@ -68,7 +75,7 @@ header a {
   display:inline-block;
   margin-top:10px;
   padding:10px 15px;
-  background:#ff9800; /* ORANGE BUTTON */
+  background:#ff9800;
   color:#fff;
   text-decoration:none;
   border-radius:6px;
@@ -82,7 +89,7 @@ header a {
 footer {
   text-align:center;
   padding:20px;
-  background:#0d47a1; /* 🔵 BLUE FOOTER BACK */
+  background:#0d47a1; /* 🔵 BLUE */
   color:#fff;
 }
 </style>
@@ -91,7 +98,12 @@ footer {
 <body>
 
 <header>
-  <h1>Findero</h1>
+  <div class="logo">
+    <!-- 🔥 PUT YOUR LOGO FILE NAME HERE -->
+    <img src="logo.png" alt="Findero Logo">
+    <h2>Findero</h2>
+  </div>
+
   <div>
     <a href="login.html">Login</a>
     <a href="signup.html">Sign Up</a>
