@@ -1,61 +1,38 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Admin Dashboard</title>
 
 <style>
-body {
-  font-family: Arial;
-  margin:0;
-  background:#f5f5f5;
-}
+body { font-family: Arial; background:#f5f5f5; margin:0; }
 
 header {
-  background:#555;
+  background:#333;
   color:#fff;
   padding:15px;
   display:flex;
   justify-content:space-between;
-  align-items:center;
 }
 
-.container {
-  padding:20px;
-}
+.container { padding:20px; }
 
 table {
   width:100%;
-  border-collapse:collapse;
   background:#fff;
+  border-collapse:collapse;
 }
 
 th, td {
   padding:10px;
   border-bottom:1px solid #ddd;
-  text-align:left;
-}
-
-th {
-  background:#eee;
-}
-
-select {
-  padding:5px;
 }
 
 button {
   padding:6px 10px;
-  border:none;
-  background:#ff9800;
+  background:#4caf50;
   color:#fff;
+  border:none;
   cursor:pointer;
-  border-radius:4px;
-}
-
-button:hover {
-  background:#fb8c00;
 }
 </style>
 </head>
@@ -69,20 +46,21 @@ button:hover {
 
 <div class="container">
 
-<h3>Manage Items</h3>
+<h3>Verify Found Items</h3>
 
 <table>
 <thead>
 <tr>
-<th>Type</th>
 <th>Name</th>
+<th>Location</th>
+<th>Secret</th>
 <th>Status</th>
 <th>Action</th>
 </tr>
 </thead>
 
 <tbody id="table">
-<tr><td colspan="4">Loading...</td></tr>
+<tr><td colspan="5">Loading...</td></tr>
 </tbody>
 
 </table>
@@ -94,10 +72,7 @@ button:hover {
 import { protectAdminPage, initAdminLogout } from './scripts/admin.js';
 import { db } from './scripts/firebase.js';
 import {
-  collection,
-  getDocs,
-  doc,
-  updateDoc
+  collection, getDocs, doc, updateDoc
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 protectAdminPage();
@@ -105,71 +80,55 @@ initAdminLogout();
 
 const table = document.getElementById("table");
 
-async function loadItems(){
-
-  table.innerHTML = "<tr><td colspan='4'>Loading...</td></tr>";
+async function load(){
 
   try {
 
-    const foundSnap = await getDocs(collection(db,"foundItems"));
-    const lostSnap = await getDocs(collection(db,"lostItems"));
+    const snap = await getDocs(collection(db,"foundItems"));
 
     table.innerHTML = "";
 
-    function addRow(item, type){
+    snap.forEach(d => {
+
+      const item = {id:d.id,...d.data()};
 
       const tr = document.createElement("tr");
 
       tr.innerHTML = `
-        <td>${type}</td>
         <td>${item.name || ""}</td>
+        <td>${item.location || ""}</td>
+        <td>${item.secret || "-"}</td>
+        <td>${item.status || "pending"}</td>
         <td>
-          <select>
-            <option value="pending" ${item.status==="pending"?"selected":""}>pending</option>
-            <option value="claimed" ${item.status==="claimed"?"selected":""}>claimed</option>
-            <option value="verified" ${item.status==="verified"?"selected":""}>verified</option>
-          </select>
+          <button>Verify</button>
         </td>
-        <td><button>Update</button></td>
       `;
 
-      const select = tr.querySelector("select");
-      const btn = tr.querySelector("button");
+      tr.querySelector("button").onclick = async () => {
 
-      btn.onclick = async () => {
-        const newStatus = select.value;
-
-        const col = type === "Found" ? "foundItems" : "lostItems";
-
-        await updateDoc(doc(db, col, item.id), {
-          status: newStatus
+        await updateDoc(doc(db,"foundItems",item.id),{
+          status: "verified"
         });
 
-        alert("Status updated successfully!");
+        alert("Item Verified!");
+        load();
       };
 
       table.appendChild(tr);
-    }
 
-    foundSnap.forEach(docu=>{
-      addRow({id:docu.id,...docu.data()}, "Found");
-    });
-
-    lostSnap.forEach(docu=>{
-      addRow({id:docu.id,...docu.data()}, "Lost");
     });
 
     if(table.innerHTML === ""){
-      table.innerHTML = "<tr><td colspan='4'>No items found</td></tr>";
+      table.innerHTML = "<tr><td colspan='5'>No items found</td></tr>";
     }
 
   } catch(err){
-    table.innerHTML = "<tr><td colspan='4'>Error loading data</td></tr>";
     console.error(err);
+    table.innerHTML = "<tr><td colspan='5'>Error loading data</td></tr>";
   }
 }
 
-loadItems();
+load();
 
 </script>
 
