@@ -5,66 +5,41 @@
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Findero — Home</title>
 
-<link rel="stylesheet" href="assets/styles.css">
-
 <style>
-/* BODY */
 body {
   font-family: Arial, sans-serif;
-  background-color: #fefefe;
-  margin: 0;
-  color: #333;
+  background:#fefefe;
+  margin:0;
+  color:#333;
 }
 
-/* HEADER (SOFT BLUE 🔵) */
+/* HEADER */
 header {
   display:flex;
   justify-content:space-between;
   align-items:center;
-  padding:12px 24px;
-  background-color:#1976d2;
-  color:white;
+  padding:10px 15px;
+  background:#1976d2;
+  color:#fff;
+  flex-wrap:wrap;
 }
 
 header img {
-  height:90px;
-  filter: drop-shadow(0 0 10px rgba(255,255,255,0.7))
-          drop-shadow(0 0 6px rgba(0,0,0,0.3));
+  height:55px;
 }
 
-/* MAIN BUTTONS */
-.main-buttons {
+/* AUTH */
+#authLinks {
   display:flex;
+  gap:6px;
   flex-wrap:wrap;
-  gap:12px;
-  justify-content:center;
-  margin-top:25px;
 }
 
-.main-buttons a {
-  padding:12px 18px;
-  background:#ff9800;
-  color:white;
-  border-radius:8px;
-  text-decoration:none;
-  font-weight:600;
-  font-size:14px;
-  transition:0.25s;
-  box-shadow: 0 4px 10px rgba(255,152,0,0.3);
-}
-
-.main-buttons a:hover {
-  background:#e68900;
-  transform:translateY(-3px);
-  box-shadow: 0 6px 18px rgba(255,152,0,0.4);
-}
-
-/* TOP BUTTONS */
 .btn {
-  padding:8px 14px;
+  padding:6px 10px;
   border-radius:6px;
+  font-size:12px;
   text-decoration:none;
-  font-size:14px;
 }
 
 .btn.ghost {
@@ -79,31 +54,59 @@ header img {
 
 /* CONTENT */
 .container {
-  padding:30px;
+  padding:20px;
   text-align:center;
 }
 
 .title {
-  font-size:26px;
+  font-size:20px;
   font-weight:bold;
   color:#0d47a1;
 }
 
 .subtitle {
-  margin-top:8px;
-  color:#555;
+  font-size:14px;
+  margin-top:5px;
 }
 
-/* FOOTER (BLUE 🔵) */
+/* BUTTON GRID */
+.main-buttons {
+  display:grid;
+  grid-template-columns:1fr;
+  gap:12px;
+  margin-top:20px;
+}
+
+.main-buttons a {
+  padding:14px;
+  background:#ff9800;
+  color:#fff;
+  border-radius:8px;
+  text-decoration:none;
+  font-weight:bold;
+}
+
+/* DESKTOP */
+@media(min-width:600px){
+  .main-buttons {
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .title {
+    font-size:26px;
+  }
+}
+
+/* FOOTER */
 .footer {
   text-align:center;
   padding:12px;
   background:#1976d2;
   color:white;
   margin-top:40px;
+  font-size:13px;
 }
 </style>
-
 </head>
 
 <body>
@@ -111,17 +114,16 @@ header img {
 <header>
   <img src="assets/logo.png" alt="Findero Logo">
 
-  <div id="authLinks" style="display:flex;gap:8px;">
+  <div id="authLinks">
     <a class="btn ghost" href="login.html">Login</a>
     <a class="btn secondary" href="signup.html">Sign Up</a>
   </div>
 </header>
 
 <main class="container">
-
   <div class="title">Welcome to Findero</div>
   <div class="subtitle">
-    Report lost or found items, search the database, or track by ID.
+    Report lost or found items, search or track easily.
   </div>
 
   <div class="main-buttons">
@@ -130,7 +132,6 @@ header img {
     <a href="search.html">Search Items</a>
     <a href="track.html">Track Item</a>
   </div>
-
 </main>
 
 <div class="footer">© 2025 Findero. All rights reserved.</div>
