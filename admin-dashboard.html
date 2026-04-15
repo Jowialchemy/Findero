@@ -4,35 +4,83 @@
 <title>Admin Dashboard</title>
 
 <style>
-body { font-family: Arial; background:#f5f5f5; margin:0; }
-
-header {
-  background:#333;
-  color:#fff;
-  padding:15px;
-  display:flex;
-  justify-content:space-between;
+body {
+  font-family: Arial;
+  background:#f5f5f5;
+  margin:0;
 }
 
-.container { padding:20px; }
+/* HEADER */
+header {
+  background:#ff9800;
+  color:#fff;
+  padding:15px 20px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+header h2 { margin:0; }
+
+button.logout {
+  background:#fff;
+  color:#ff9800;
+  border:none;
+  padding:8px 12px;
+  border-radius:6px;
+  cursor:pointer;
+  font-weight:bold;
+}
+
+/* TABLE */
+.container {
+  padding:20px;
+}
 
 table {
   width:100%;
   background:#fff;
+  border-radius:10px;
+  overflow:hidden;
+  box-shadow:0 4px 12px rgba(0,0,0,0.1);
   border-collapse:collapse;
 }
 
-th, td {
-  padding:10px;
-  border-bottom:1px solid #ddd;
+th {
+  background:#ff9800;
+  color:#fff;
+  text-align:left;
 }
 
-button {
-  padding:6px 10px;
+th, td {
+  padding:12px;
+  border-bottom:1px solid #eee;
+}
+
+tr:hover {
+  background:#fff3e0;
+}
+
+/* STATUS COLORS */
+.status {
+  font-weight:bold;
+}
+
+.pending { color:#ff9800; }
+.verified { color:#4caf50; }
+
+/* BUTTON */
+.action-btn {
   background:#4caf50;
   color:#fff;
   border:none;
+  padding:6px 10px;
+  border-radius:5px;
   cursor:pointer;
+}
+
+.action-btn:hover {
+  background:#43a047;
 }
 </style>
 </head>
@@ -41,12 +89,12 @@ button {
 
 <header>
   <h2>Admin Panel</h2>
-  <button id="btnLogout">Logout</button>
+  <button id="btnLogout" class="logout">Logout</button>
 </header>
 
 <div class="container">
 
-<h3>Verify Found Items</h3>
+<h3>Manage Found Items</h3>
 
 <table>
 <thead>
@@ -85,7 +133,6 @@ async function load(){
   try {
 
     const snap = await getDocs(collection(db,"foundItems"));
-
     table.innerHTML = "";
 
     snap.forEach(d => {
@@ -98,9 +145,11 @@ async function load(){
         <td>${item.name || ""}</td>
         <td>${item.location || ""}</td>
         <td>${item.secret || "-"}</td>
-        <td>${item.status || "pending"}</td>
+        <td class="status ${item.status}">
+          ${item.status || "pending"}
+        </td>
         <td>
-          <button>Verify</button>
+          <button class="action-btn">Verify</button>
         </td>
       `;
 
@@ -110,7 +159,6 @@ async function load(){
           status: "verified"
         });
 
-        alert("Item Verified!");
         load();
       };
 
