@@ -8,71 +8,43 @@
 <style>
 body {
   font-family: Arial;
-  background: linear-gradient(135deg,#fff3e0,#ffe0b2);
+  background:#f5f5f5;
   margin:0;
 }
 
-/* CARD FORM */
 .container {
+  width:90%;
   max-width:500px;
-  margin:50px auto;
+  margin:30px auto;
   background:#fff;
-  padding:30px;
-  border-radius:15px;
-  box-shadow:0 8px 25px rgba(0,0,0,0.1);
-  animation:fadeIn 0.5s ease;
+  padding:20px;
+  border-radius:12px;
 }
 
 h2 {
   text-align:center;
-  margin-bottom:20px;
 }
 
-/* INPUTS */
 input, textarea {
   width:100%;
   padding:12px;
-  margin:10px 0;
-  border-radius:8px;
-  border:1px solid #ddd;
-  transition:0.3s;
+  margin:8px 0;
+  border-radius:6px;
+  border:1px solid #ccc;
 }
 
-input:focus, textarea:focus {
-  border-color:#ff9800;
-  outline:none;
-  box-shadow:0 0 5px rgba(255,152,0,0.3);
-}
-
-/* BUTTON */
 button {
   width:100%;
   padding:14px;
   background:#ff9800;
   border:none;
   color:#fff;
-  font-weight:bold;
-  border-radius:8px;
-  cursor:pointer;
-  transition:0.3s;
+  border-radius:6px;
 }
 
-button:hover {
-  background:#fb8c00;
-  transform:translateY(-2px);
-}
-
-/* STATUS */
 #status {
   text-align:center;
   margin-top:10px;
-  font-weight:bold;
-}
-
-/* ANIMATION */
-@keyframes fadeIn {
-  from {opacity:0; transform:translateY(10px);}
-  to {opacity:1; transform:translateY(0);}
 }
 </style>
 </head>
@@ -80,66 +52,39 @@ button:hover {
 <body>
 
 <div class="container">
-
 <h2>Report Found Item</h2>
 
 <input id="name" placeholder="Item Name">
 <input id="location" placeholder="Where you found it">
-<textarea id="description" placeholder="Describe the item"></textarea>
+<textarea id="description" placeholder="Describe item"></textarea>
+<input id="secret" placeholder="Secret Identifier">
 
-<input id="secret" placeholder="Secret Identifier (only real owner knows)">
-
-<button id="submitBtn">Submit Item</button>
-
+<button id="submitBtn">Submit</button>
 <p id="status"></p>
-
 </div>
 
 <script type="module">
 import { db } from "./scripts/firebase.js";
 import { collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-const btn = document.getElementById("submitBtn");
-const statusText = document.getElementById("status");
-
-btn.onclick = async () => {
-
-  const name = document.getElementById("name").value.trim();
-  const location = document.getElementById("location").value.trim();
-  const description = document.getElementById("description").value.trim();
-  const secret = document.getElementById("secret").value.trim();
+document.getElementById("submitBtn").onclick = async () => {
+  const name = name.value;
+  const location = location.value;
+  const description = description.value;
+  const secret = secret.value;
 
   if(!name || !location){
-    statusText.style.color = "red";
-    statusText.innerText = "Please fill required fields";
+    status.innerText = "Fill required fields";
     return;
   }
 
-  try {
+  await addDoc(collection(db,"foundItems"),{
+    name,location,description,secret,
+    status:"pending",
+    createdAt:Date.now()
+  });
 
-    await addDoc(collection(db,"foundItems"), {
-      name,
-      location,
-      description,
-      secret,
-      status: "pending",
-      createdAt: Date.now()
-    });
-
-    statusText.style.color = "green";
-    statusText.innerText = "Item submitted successfully!";
-
-    // RESET FORM
-    document.getElementById("name").value = "";
-    document.getElementById("location").value = "";
-    document.getElementById("description").value = "";
-    document.getElementById("secret").value = "";
-
-  } catch(err){
-    console.error(err);
-    statusText.style.color = "red";
-    statusText.innerText = "Error submitting item";
-  }
+  status.innerText = "Submitted!";
 };
 </script>
 
