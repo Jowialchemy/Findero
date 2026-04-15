@@ -45,7 +45,8 @@ button {
 <input id="name" placeholder="Item Name">
 <input id="location" placeholder="Where you found it">
 <textarea id="description" placeholder="Describe the item"></textarea>
-<input id="image" type="file">
+
+<input id="secret" placeholder="Secret Identifier (only real owner knows)">
 
 <button id="submitBtn">Submit</button>
 
@@ -65,6 +66,7 @@ btn.onclick = async () => {
   const name = document.getElementById("name").value;
   const location = document.getElementById("location").value;
   const description = document.getElementById("description").value;
+  const secret = document.getElementById("secret").value;
 
   if(!name || !location){
     alert("Please fill required fields");
@@ -77,7 +79,8 @@ btn.onclick = async () => {
       name,
       location,
       description,
-      status: "pending", // ✅ IMPORTANT
+      secret,
+      status: "pending",
       createdAt: Date.now()
     });
 
