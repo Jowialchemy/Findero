@@ -6,32 +6,73 @@
 <title>Report Found Item</title>
 
 <style>
-body { font-family: Arial; background:#f5f5f5; margin:0; }
+body {
+  font-family: Arial;
+  background: linear-gradient(135deg,#fff3e0,#ffe0b2);
+  margin:0;
+}
 
+/* CARD FORM */
 .container {
   max-width:500px;
-  margin:40px auto;
+  margin:50px auto;
   background:#fff;
-  padding:25px;
-  border-radius:10px;
+  padding:30px;
+  border-radius:15px;
+  box-shadow:0 8px 25px rgba(0,0,0,0.1);
+  animation:fadeIn 0.5s ease;
 }
 
+h2 {
+  text-align:center;
+  margin-bottom:20px;
+}
+
+/* INPUTS */
 input, textarea {
   width:100%;
-  padding:10px;
+  padding:12px;
   margin:10px 0;
-  border-radius:5px;
-  border:1px solid #ccc;
+  border-radius:8px;
+  border:1px solid #ddd;
+  transition:0.3s;
 }
 
+input:focus, textarea:focus {
+  border-color:#ff9800;
+  outline:none;
+  box-shadow:0 0 5px rgba(255,152,0,0.3);
+}
+
+/* BUTTON */
 button {
   width:100%;
-  padding:12px;
+  padding:14px;
   background:#ff9800;
   border:none;
   color:#fff;
   font-weight:bold;
+  border-radius:8px;
   cursor:pointer;
+  transition:0.3s;
+}
+
+button:hover {
+  background:#fb8c00;
+  transform:translateY(-2px);
+}
+
+/* STATUS */
+#status {
+  text-align:center;
+  margin-top:10px;
+  font-weight:bold;
+}
+
+/* ANIMATION */
+@keyframes fadeIn {
+  from {opacity:0; transform:translateY(10px);}
+  to {opacity:1; transform:translateY(0);}
 }
 </style>
 </head>
@@ -48,7 +89,7 @@ button {
 
 <input id="secret" placeholder="Secret Identifier (only real owner knows)">
 
-<button id="submitBtn">Submit</button>
+<button id="submitBtn">Submit Item</button>
 
 <p id="status"></p>
 
@@ -63,13 +104,14 @@ const statusText = document.getElementById("status");
 
 btn.onclick = async () => {
 
-  const name = document.getElementById("name").value;
-  const location = document.getElementById("location").value;
-  const description = document.getElementById("description").value;
-  const secret = document.getElementById("secret").value;
+  const name = document.getElementById("name").value.trim();
+  const location = document.getElementById("location").value.trim();
+  const description = document.getElementById("description").value.trim();
+  const secret = document.getElementById("secret").value.trim();
 
   if(!name || !location){
-    alert("Please fill required fields");
+    statusText.style.color = "red";
+    statusText.innerText = "Please fill required fields";
     return;
   }
 
@@ -84,10 +126,18 @@ btn.onclick = async () => {
       createdAt: Date.now()
     });
 
+    statusText.style.color = "green";
     statusText.innerText = "Item submitted successfully!";
-    
+
+    // RESET FORM
+    document.getElementById("name").value = "";
+    document.getElementById("location").value = "";
+    document.getElementById("description").value = "";
+    document.getElementById("secret").value = "";
+
   } catch(err){
     console.error(err);
+    statusText.style.color = "red";
     statusText.innerText = "Error submitting item";
   }
 };
