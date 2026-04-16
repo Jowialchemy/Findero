@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Report Found Item</title>
 
 <style>
@@ -21,9 +21,7 @@ body {
   border-radius:12px;
 }
 
-h2 {
-  text-align:center;
-}
+h2 { text-align:center; }
 
 input, textarea {
   width:100%;
@@ -40,6 +38,13 @@ button {
   border:none;
   color:#fff;
   border-radius:6px;
+  cursor:pointer;
+}
+
+#preview {
+  width:100%;
+  margin-top:10px;
+  border-radius:8px;
 }
 
 #status {
@@ -52,40 +57,97 @@ button {
 <body>
 
 <div class="container">
+
 <h2>Report Found Item</h2>
 
 <input id="name" placeholder="Item Name">
-<input id="location" placeholder="Where you found it">
-<textarea id="description" placeholder="Describe item"></textarea>
+<input id="location" placeholder="Location Found">
+<textarea id="description" placeholder="Describe the item"></textarea>
 <input id="secret" placeholder="Secret Identifier">
 
-<button id="submitBtn">Submit</button>
+<!-- 🔥 IMAGE UPLOAD -->
+<input type="file" id="image">
+
+<img id="preview" style="display:none;"/>
+
+<button type="button" id="submitBtn">Submit</button>
+
 <p id="status"></p>
+
 </div>
 
 <script type="module">
 import { db } from "./scripts/firebase.js";
 import { collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-document.getElementById("submitBtn").onclick = async () => {
-  const name = name.value;
-  const location = location.value;
-  const description = description.value;
-  const secret = secret.value;
+const btn = document.getElementById("submitBtn");
+const status = document.getElementById("status");
+const imageInput = document.getElementById("image");
+const preview = document.getElementById("preview");
+
+let imageBase64 = "";
+
+/* 🔥 IMAGE PREVIEW */
+imageInput.addEventListener("change", () => {
+  const file = imageInput.files[0];
+
+  if(file){
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      imageBase64 = reader.result;
+      preview.src = imageBase64;
+      preview.style.display = "block";
+    };
+
+    reader.readAsDataURL(file);
+  }
+});
+
+/* 🔥 SUBMIT FIXED */
+btn.addEventListener("click", async () => {
+
+  const name = document.getElementById("name").value.trim();
+  const location = document.getElementById("location").value.trim();
+  const description = document.getElementById("description").value.trim();
+  const secret = document.getElementById("secret").value.trim();
 
   if(!name || !location){
     status.innerText = "Fill required fields";
+    status.style.color = "red";
     return;
   }
 
-  await addDoc(collection(db,"foundItems"),{
-    name,location,description,secret,
-    status:"pending",
-    createdAt:Date.now()
-  });
+  status.innerText = "Submitting...";
 
-  status.innerText = "Submitted!";
-};
+  try {
+    await addDoc(collection(db,"foundItems"),{
+      name,
+      location,
+      description,
+      secret,
+      image: imageBase64 || "",
+      status:"pending",
+      createdAt: Date.now()
+    });
+
+    status.innerText = "Item submitted successfully!";
+    status.style.color = "green";
+
+    // reset form
+    document.getElementById("name").value = "";
+    document.getElementById("location").value = "";
+    document.getElementById("description").value = "";
+    document.getElementById("secret").value = "";
+    imageInput.value = "";
+    preview.style.display = "none";
+
+  } catch(err){
+    status.innerText = err.message;
+    status.style.color = "red";
+  }
+
+});
 </script>
 
 </body>
