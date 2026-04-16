@@ -21,7 +21,9 @@ body {
   border-radius:12px;
 }
 
-h2 { text-align:center; }
+h2 {
+  text-align:center;
+}
 
 input {
   width:100%;
@@ -31,7 +33,9 @@ input {
   border:1px solid #ccc;
 }
 
-.password-box { position:relative; }
+.password-box {
+  position:relative;
+}
 
 .toggle {
   position:absolute;
@@ -39,8 +43,10 @@ input {
   top:50%;
   transform:translateY(-50%);
   cursor:pointer;
+  font-size:14px;
 }
 
+/* BUTTONS */
 button {
   width:100%;
   padding:14px;
@@ -51,8 +57,20 @@ button {
   cursor:pointer;
 }
 
-.signup-btn { background:#ff9800; color:#fff; }
-.login-btn { background:#1976d2; color:#fff; }
+.signup-btn {
+  background:#ff9800;
+  color:#fff;
+}
+
+.login-btn {
+  background:#1976d2;
+  color:#fff;
+}
+
+#status {
+  text-align:center;
+  margin-top:10px;
+}
 </style>
 </head>
 
@@ -62,28 +80,35 @@ button {
 
 <h2>Create Account</h2>
 
+<!-- 🔥 FULL NAME -->
+<input id="name" type="text" placeholder="Full Name">
+
+<!-- 🔥 EMAIL -->
 <input id="email" type="email" placeholder="Email">
 
-<!-- 🔥 NEW PHONE FIELD -->
+<!-- 🔥 PHONE -->
 <input id="phone" type="tel" placeholder="Phone Number">
 
+<!-- PASSWORD -->
 <div class="password-box">
   <input id="password" type="password" placeholder="Password">
   <span class="toggle" onclick="togglePass('password')">👁</span>
 </div>
 
+<!-- CONFIRM -->
 <div class="password-box">
   <input id="confirmPassword" type="password" placeholder="Confirm Password">
   <span class="toggle" onclick="togglePass('confirmPassword')">👁</span>
 </div>
 
+<!-- BUTTON -->
 <button type="button" class="signup-btn" id="signupBtn">Sign Up</button>
 
 <button type="button" class="login-btn" onclick="window.location='login.html'">
   Already have an account? Login
 </button>
 
-<p id="status" style="text-align:center;"></p>
+<p id="status"></p>
 
 </div>
 
@@ -97,13 +122,21 @@ const status = document.getElementById("status");
 
 btn.addEventListener("click", async () => {
 
+  const name = document.getElementById("name").value.trim();
   const email = document.getElementById("email").value.trim();
   const phone = document.getElementById("phone").value.trim();
   const password = document.getElementById("password").value.trim();
   const confirm = document.getElementById("confirmPassword").value.trim();
 
-  if(!email || !phone || !password){
-    status.innerText = "Fill all fields";
+  // ✅ VALIDATION
+  if(!name || !email || !phone || !password){
+    status.innerText = "Please fill all fields";
+    status.style.color = "red";
+    return;
+  }
+
+  if(password.length < 6){
+    status.innerText = "Password must be at least 6 characters";
     status.style.color = "red";
     return;
   }
@@ -115,12 +148,14 @@ btn.addEventListener("click", async () => {
   }
 
   status.innerText = "Creating account...";
+  status.style.color = "black";
 
   try {
     const userCred = await createUserWithEmailAndPassword(auth, email, password);
 
-    // 🔥 SAVE EXTRA DATA TO FIRESTORE
+    // ✅ SAVE USER DATA
     await setDoc(doc(db, "users", userCred.user.uid), {
+      name: name,
       email: email,
       phone: phone,
       createdAt: Date.now()
@@ -129,6 +164,7 @@ btn.addEventListener("click", async () => {
     status.innerText = "Account created successfully!";
     status.style.color = "green";
 
+    // ✅ REDIRECT
     setTimeout(() => {
       window.location.href = "dashboard.html";
     }, 1000);
