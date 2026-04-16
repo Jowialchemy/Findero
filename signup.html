@@ -21,9 +21,7 @@ body {
   border-radius:12px;
 }
 
-h2 {
-  text-align:center;
-}
+h2 { text-align:center; }
 
 input {
   width:100%;
@@ -33,9 +31,7 @@ input {
   border:1px solid #ccc;
 }
 
-.password-box {
-  position:relative;
-}
+.password-box { position:relative; }
 
 .toggle {
   position:absolute;
@@ -55,15 +51,8 @@ button {
   cursor:pointer;
 }
 
-.signup-btn {
-  background:#ff9800;
-  color:#fff;
-}
-
-.login-btn {
-  background:#1976d2;
-  color:#fff;
-}
+.signup-btn { background:#ff9800; color:#fff; }
+.login-btn { background:#1976d2; color:#fff; }
 </style>
 </head>
 
@@ -74,6 +63,9 @@ button {
 <h2>Create Account</h2>
 
 <input id="email" type="email" placeholder="Email">
+
+<!-- 🔥 NEW PHONE FIELD -->
+<input id="phone" type="tel" placeholder="Phone Number">
 
 <div class="password-box">
   <input id="password" type="password" placeholder="Password">
@@ -96,8 +88,9 @@ button {
 </div>
 
 <script type="module">
-import { auth } from './scripts/firebase.js';
+import { auth, db } from './scripts/firebase.js';
 import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const btn = document.getElementById("signupBtn");
 const status = document.getElementById("status");
@@ -105,10 +98,11 @@ const status = document.getElementById("status");
 btn.addEventListener("click", async () => {
 
   const email = document.getElementById("email").value.trim();
+  const phone = document.getElementById("phone").value.trim();
   const password = document.getElementById("password").value.trim();
   const confirm = document.getElementById("confirmPassword").value.trim();
 
-  if(!email || !password){
+  if(!email || !phone || !password){
     status.innerText = "Fill all fields";
     status.style.color = "red";
     return;
@@ -121,15 +115,20 @@ btn.addEventListener("click", async () => {
   }
 
   status.innerText = "Creating account...";
-  status.style.color = "black";
 
   try {
-    await createUserWithEmailAndPassword(auth, email, password);
+    const userCred = await createUserWithEmailAndPassword(auth, email, password);
+
+    // 🔥 SAVE EXTRA DATA TO FIRESTORE
+    await setDoc(doc(db, "users", userCred.user.uid), {
+      email: email,
+      phone: phone,
+      createdAt: Date.now()
+    });
 
     status.innerText = "Account created successfully!";
     status.style.color = "green";
 
-    // 🔥 Redirect after signup
     setTimeout(() => {
       window.location.href = "dashboard.html";
     }, 1000);
