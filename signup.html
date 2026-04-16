@@ -33,7 +33,6 @@ input {
   border:1px solid #ccc;
 }
 
-/* PASSWORD TOGGLE */
 .password-box {
   position:relative;
 }
@@ -46,7 +45,6 @@ input {
   cursor:pointer;
 }
 
-/* BUTTONS */
 button {
   width:100%;
   padding:14px;
@@ -75,10 +73,7 @@ button {
 
 <h2>Create Account</h2>
 
-<input id="name" placeholder="Full Name">
-<input id="email" placeholder="Email">
-
-<input id="username" placeholder="Username">
+<input id="email" type="email" placeholder="Email">
 
 <div class="password-box">
   <input id="password" type="password" placeholder="Password">
@@ -90,7 +85,6 @@ button {
   <span class="toggle" onclick="togglePass('confirmPassword')">👁</span>
 </div>
 
-<!-- IMPORTANT: type="button" -->
 <button type="button" class="signup-btn" id="signupBtn">Sign Up</button>
 
 <button type="button" class="login-btn" onclick="window.location='login.html'">
@@ -108,11 +102,17 @@ import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebase
 const btn = document.getElementById("signupBtn");
 const status = document.getElementById("status");
 
-btn.onclick = async () => {
+btn.addEventListener("click", async () => {
 
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
-  const confirm = document.getElementById("confirmPassword").value;
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value.trim();
+  const confirm = document.getElementById("confirmPassword").value.trim();
+
+  if(!email || !password){
+    status.innerText = "Fill all fields";
+    status.style.color = "red";
+    return;
+  }
 
   if(password !== confirm){
     status.innerText = "Passwords do not match";
@@ -120,21 +120,32 @@ btn.onclick = async () => {
     return;
   }
 
+  status.innerText = "Creating account...";
+  status.style.color = "black";
+
   try {
     await createUserWithEmailAndPassword(auth, email, password);
+
     status.innerText = "Account created successfully!";
     status.style.color = "green";
+
+    // 🔥 Redirect after signup
+    setTimeout(() => {
+      window.location.href = "dashboard.html";
+    }, 1000);
+
   } catch(err){
     status.innerText = err.message;
     status.style.color = "red";
   }
-};
+
+});
 
 /* SHOW PASSWORD */
 window.togglePass = function(id){
   const input = document.getElementById(id);
   input.type = input.type === "password" ? "text" : "password";
-}
+};
 </script>
 
 </body>
