@@ -45,6 +45,7 @@ button {
   width:100%;
   margin-top:10px;
   border-radius:8px;
+  display:none;
 }
 
 #status {
@@ -65,52 +66,42 @@ button {
 <textarea id="description" placeholder="Describe the item"></textarea>
 <input id="secret" placeholder="Secret Identifier">
 
-<!-- 🔥 IMAGE UPLOAD -->
-<input type="file" id="image">
+<input type="file" id="image" accept="image/*">
+<img id="preview">
 
-<img id="preview" style="display:none;"/>
-
-<button type="button" id="submitBtn">Submit</button>
+<button id="submitBtn">Submit</button>
 
 <p id="status"></p>
 
 </div>
 
 <script type="module">
-import { db } from "./scripts/firebase.js";
+import { db, storage } from "./scripts/firebase.js";
 import { collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
 const btn = document.getElementById("submitBtn");
 const status = document.getElementById("status");
 const imageInput = document.getElementById("image");
 const preview = document.getElementById("preview");
 
-let imageBase64 = "";
-
-/* 🔥 IMAGE PREVIEW */
+// ✅ IMAGE PREVIEW (SAFE)
 imageInput.addEventListener("change", () => {
   const file = imageInput.files[0];
-
   if(file){
-    const reader = new FileReader();
-
-    reader.onload = () => {
-      imageBase64 = reader.result;
-      preview.src = imageBase64;
-      preview.style.display = "block";
-    };
-
-    reader.readAsDataURL(file);
+    preview.src = URL.createObjectURL(file);
+    preview.style.display = "block";
   }
 });
 
-/* 🔥 SUBMIT FIXED */
+// ✅ SUBMIT
 btn.addEventListener("click", async () => {
 
   const name = document.getElementById("name").value.trim();
   const location = document.getElementById("location").value.trim();
   const description = document.getElementById("description").value.trim();
   const secret = document.getElementById("secret").value.trim();
+  const file = imageInput.files[0];
 
   if(!name || !location){
     status.innerText = "Fill required fields";
@@ -119,14 +110,25 @@ btn.addEventListener("click", async () => {
   }
 
   status.innerText = "Submitting...";
+  status.style.color = "black";
 
   try {
+    let imageURL = "";
+
+    // ✅ Upload image to Firebase Storage
+    if(file){
+      const storageRef = ref(storage, "found-items/" + Date.now() + "_" + file.name);
+      const snapshot = await uploadBytes(storageRef, file);
+      imageURL = await getDownloadURL(snapshot.ref);
+    }
+
+    // ✅ Save ONLY URL to Firestore
     await addDoc(collection(db,"foundItems"),{
-      name,
-      location,
-      description,
-      secret,
-      image: imageBase64 || "",
+      name: name,
+      location: location,
+      description: description,
+      secret: secret,
+      imageURL: imageURL,
       status:"pending",
       createdAt: Date.now()
     });
@@ -134,7 +136,7 @@ btn.addEventListener("click", async () => {
     status.innerText = "Item submitted successfully!";
     status.style.color = "green";
 
-    // reset form
+    // RESET FORM
     document.getElementById("name").value = "";
     document.getElementById("location").value = "";
     document.getElementById("description").value = "";
@@ -143,6 +145,7 @@ btn.addEventListener("click", async () => {
     preview.style.display = "none";
 
   } catch(err){
+    console.error(err);
     status.innerText = err.message;
     status.style.color = "red";
   }
