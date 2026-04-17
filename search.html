@@ -5,14 +5,15 @@
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Search Items — Findero</title>
 
-<link rel="stylesheet" href="assets/styles.css">
-
 <style>
+body { font-family: Arial; background:#f5f5f5; margin:0; }
+
+.container { padding:20px; }
+
 .search-box {
   display:flex;
   flex-wrap:wrap;
   gap:10px;
-  margin-top:20px;
 }
 
 .search-box input, .search-box select {
@@ -21,116 +22,86 @@
   border:1px solid #ccc;
 }
 
-.results-grid {
-  margin-top:20px;
+.card {
+  background:#fff;
+  padding:15px;
+  margin-top:10px;
+  border-radius:10px;
 }
 
 .card img {
   width:100%;
+  margin-top:10px;
   border-radius:8px;
-  margin-top:8px;
 }
 </style>
-
 </head>
 
 <body>
 
-<header>
-  <img src="assets/logo.png">
-</header>
+<div class="container">
 
-<main class="container">
+<h2>Search Items</h2>
 
-  <div class="title">Search Items</div>
-  <div class="subtitle">Find lost or found items easily</div>
+<div class="search-box">
+  <input type="text" id="searchInput" placeholder="Search item...">
+  <select id="typeFilter">
+    <option value="">All</option>
+    <option value="lost">Lost</option>
+    <option value="found">Found</option>
+  </select>
+  <input type="text" id="locationFilter" placeholder="Location">
+</div>
 
-  <!-- SEARCH CONTROLS -->
-  <div class="search-box">
-    <input type="text" id="searchInput" placeholder="Search item name...">
+<div id="results"></div>
 
-    <select id="typeFilter">
-      <option value="">All</option>
-      <option value="lost">Lost</option>
-      <option value="found">Found</option>
-    </select>
+</div>
 
-    <input type="text" id="locationFilter" placeholder="Filter by location">
-  </div>
+<script type="module">
+import { db } from "./scripts/firebase.js";
+import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-  <!-- RESULTS -->
-  <div id="results" class="results-grid"></div>
-
-</main>
-
-<div class="footer">© 2025 Findero. All rights reserved.</div>
-
-<script src="scripts/firebase.js"></script>
-
-<script>
-const searchInput = document.getElementById("searchInput");
-const typeFilter = document.getElementById("typeFilter");
-const locationFilter = document.getElementById("locationFilter");
 const resultsDiv = document.getElementById("results");
+
+async function loadItems(){
+  resultsDiv.innerHTML = "Loading...";
+
+  const lostSnap = await getDocs(collection(db,"lostItems"));
+  const foundSnap = await getDocs(collection(db,"foundItems"));
+
+  let items = [];
+
+  lostSnap.forEach(doc=>{
+    items.push({ ...doc.data(), type:"lost" });
+  });
+
+  foundSnap.forEach(doc=>{
+    items.push({ ...doc.data(), type:"found" });
+  });
+
+  renderItems(items);
+}
 
 function renderItems(items){
   resultsDiv.innerHTML = "";
 
   if(items.length === 0){
-    resultsDiv.innerHTML = "<p>No items found</p>";
+    resultsDiv.innerHTML = "No items found";
     return;
   }
 
-  items.forEach(item => {
+  items.forEach(item=>{
     resultsDiv.innerHTML += `
       <div class="card">
-        <strong>${item.name || "Unnamed Item"}</strong><br>
+        <strong>${item.item || item.name || "Item"}</strong><br>
         Type: ${item.type}<br>
         Location: ${item.location || "N/A"}<br>
-        Status: ${item.status}<br>
-        Tracking ID: ${item.trackingID || "N/A"}
         <p>${item.description || ""}</p>
-        ${item.image ? `<img src="${item.image}">` : ""}
+        ${item.imageURL ? `<img src="${item.imageURL}">` : ""}
       </div>
     `;
   });
 }
-
-// 🔥 LOAD + FILTER DATA
-function loadItems(){
-  db.collection("items").orderBy("date", "desc").onSnapshot(snapshot => {
-    let items = [];
-
-    snapshot.forEach(doc => {
-      items.push(doc.data());
-    });
-
-    applyFilters(items);
-  });
-}
-
-function applyFilters(items){
-  const text = searchInput.value.toLowerCase();
-  const type = typeFilter.value;
-  const location = locationFilter.value.toLowerCase();
-
-  const filtered = items.filter(item => {
-
-    return (
-      (!text || (item.name || "").toLowerCase().includes(text)) &&
-      (!type || item.type === type) &&
-      (!location || (item.location || "").toLowerCase().includes(location))
-    );
-
-  });
-
-  renderItems(filtered);
-}
-
-// 🔁 LIVE SEARCH
-searchInput.addEventListener("input", applyFilters);
-typeFilter.addEventListener("change", applyFilters);
-locationFilter.addEventListener("input", applyFilters);
 
 loadItems();
 </script>
