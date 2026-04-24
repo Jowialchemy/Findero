@@ -1,82 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Report Lost Item</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Report Lost Item</title>
 
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f5f5f5;
-      margin: 0;
-      padding: 20px;
-    }
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #f5f5f5;
+  margin: 0;
+  padding: 20px;
+}
 
-    .container {
-      max-width: 600px;
-      margin: auto;
-      background: #fff;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
+.container {
+  max-width: 600px;
+  margin: auto;
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+}
 
-    h2 {
-      text-align: center;
-      margin-bottom: 20px;
-    }
+h2 {
+  text-align: center;
+}
 
-    input, textarea {
-      width: 100%;
-      padding: 12px;
-      margin-bottom: 12px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      font-size: 14px;
-    }
+input, textarea {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
 
-    textarea {
-      resize: none;
-      height: 100px;
-    }
+textarea {
+  height: 100px;
+}
 
-    .btn-group {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
+button {
+  width: 100%;
+  padding: 14px;
+  background: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
 
-    button {
-      flex: 1;
-      padding: 12px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 16px;
-    }
+#preview {
+  width: 100%;
+  border-radius: 8px;
+  margin-top: 10px;
+  display: none;
+}
 
-    .submit-btn {
-      background: #e74c3c;
-      color: white;
-    }
-
-    .submit-btn:disabled {
-      background: #aaa;
-    }
-
-    .msg {
-      text-align: center;
-      margin-top: 10px;
-      font-weight: bold;
-    }
-
-    @media (max-width: 600px) {
-      button {
-        width: 100%;
-      }
-    }
-  </style>
+.msg {
+  text-align: center;
+  margin-top: 10px;
+  font-weight: bold;
+}
+</style>
 </head>
 
 <body>
@@ -84,102 +67,111 @@
 <div class="container">
   <h2>Report Lost Item</h2>
 
-  <input type="text" id="name" placeholder="Your Name" />
-  <input type="text" id="item" placeholder="Item Lost (e.g. Phone, Bag)" />
-  <input type="text" id="location" placeholder="Where it was lost" />
-  <input type="date" id="dateLost" />
+  <input type="text" id="name" placeholder="Your Name">
+  <input type="text" id="item" placeholder="Item Lost (e.g Phone, Bag)">
+  <input type="text" id="location" placeholder="Where it was lost">
+  <input type="date" id="dateLost">
+  <textarea id="description" placeholder="Describe the item"></textarea>
+  <input type="text" id="contact" placeholder="Contact Info (Phone/WhatsApp)">
 
-  <textarea id="description" placeholder="Describe the item..."></textarea>
+  <!-- IMAGE -->
+  <input type="file" id="imageFile" accept="image/*">
+  <img id="preview">
 
-  <input type="text" id="contact" placeholder="Contact Info (Phone/WhatsApp)" />
-
-  <input type="file" id="imageFile" accept="image/*" />
-
-  <div class="btn-group">
-    <button class="submit-btn" id="submitBtn">Submit Report</button>
-  </div>
+  <button id="submitBtn">Submit Report</button>
 
   <div class="msg" id="msg"></div>
 </div>
 
-<!-- Firebase (MODULAR SDK) -->
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
-  import { getFirestore, addDoc, collection, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
-  import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-storage.js";
+import { db, storage } from "./scripts/firebase.js";
+import { collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
-  // 🔴 YOUR FIREBASE CONFIG (keep yours here)
-  const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_AUTH_DOMAIN",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_STORAGE_BUCKET",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
-  };
+const btn = document.getElementById("submitBtn");
+const msg = document.getElementById("msg");
+const imageInput = document.getElementById("imageFile");
+const preview = document.getElementById("preview");
 
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-  const storage = getStorage(app);
+/* ✅ IMAGE PREVIEW */
+imageInput.addEventListener("change", () => {
+  const file = imageInput.files[0];
+  if(file){
+    preview.src = URL.createObjectURL(file);
+    preview.style.display = "block";
+  }
+});
 
-  const submitBtn = document.getElementById("submitBtn");
-  const msg = document.getElementById("msg");
+/* ✅ SUBMIT */
+btn.addEventListener("click", async () => {
 
-  submitBtn.addEventListener("click", async () => {
-    const name = document.getElementById("name").value.trim();
-    const item = document.getElementById("item").value.trim();
-    const location = document.getElementById("location").value.trim();
-    const dateLost = document.getElementById("dateLost").value;
-    const description = document.getElementById("description").value.trim();
-    const contact = document.getElementById("contact").value.trim();
-    const imageFile = document.getElementById("imageFile").files[0];
+  const name = document.getElementById("name").value.trim();
+  const item = document.getElementById("item").value.trim();
+  const location = document.getElementById("location").value.trim();
+  const dateLost = document.getElementById("dateLost").value;
+  const description = document.getElementById("description").value.trim();
+  const contact = document.getElementById("contact").value.trim();
+  const file = imageInput.files[0];
 
-    if (!name || !item || !location || !description || !contact) {
-      msg.style.color = "red";
-      msg.textContent = "Please fill all required fields.";
-      return;
-    }
+  if(!name || !item || !location || !description || !contact){
+    msg.style.color = "red";
+    msg.innerText = "Please fill all required fields";
+    return;
+  }
 
-    submitBtn.disabled = true;
-    submitBtn.textContent = "Submitting...";
-    msg.textContent = "";
+  msg.innerText = "Uploading...";
 
-    try {
-      let imageURL = "";
+  try {
+    let imageURL = "";
 
-      // Upload image if exists
-      if (imageFile) {
-        const imageRef = ref(storage, `lost-items/${Date.now()}-${imageFile.name}`);
-        const snapshot = await uploadBytes(imageRef, imageFile);
-        imageURL = await getDownloadURL(snapshot.ref);
-      }
+    if(file){
+      const storageRef = ref(storage, "lost-items/" + Date.now() + "_" + file.name);
+      const uploadTask = uploadBytesResumable(storageRef, file);
 
-      // Save to Firestore
-      await addDoc(collection(db, "lostItems"), {
-        name,
-        item,
-        location,
-        dateLost,
-        description,
-        contact,
-        imageURL,
-        createdAt: serverTimestamp()
+      await new Promise((resolve, reject) => {
+        uploadTask.on(
+          "state_changed",
+          (snapshot) => {
+            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            msg.innerText = "Uploading: " + Math.round(progress) + "%";
+          },
+          (error) => reject(error),
+          async () => {
+            imageURL = await getDownloadURL(uploadTask.snapshot.ref);
+            resolve();
+          }
+        );
       });
-
-      msg.style.color = "green";
-      msg.textContent = "Lost item reported successfully!";
-
-      // Reset form
-      document.querySelectorAll("input, textarea").forEach(el => el.value = "");
-    } catch (error) {
-      console.error(error);
-      msg.style.color = "red";
-      msg.textContent = "Error submitting report.";
     }
 
-    submitBtn.disabled = false;
-    submitBtn.textContent = "Submit Report";
-  });
+    msg.innerText = "Saving...";
+
+    await addDoc(collection(db, "lostItems"), {
+      name,
+      item,
+      location,
+      dateLost,
+      description,
+      contact,
+      imageURL,
+      status: "pending",
+      createdAt: Date.now()
+    });
+
+    msg.style.color = "green";
+    msg.innerText = "✅ Lost item reported successfully!";
+
+    // RESET
+    document.querySelectorAll("input, textarea").forEach(el => el.value = "");
+    preview.style.display = "none";
+
+  } catch (error) {
+    console.error(error);
+    msg.style.color = "red";
+    msg.innerText = error.message;
+  }
+
+});
 </script>
 
 </body>
