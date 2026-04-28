@@ -11,7 +11,7 @@ const firebaseConfig = {
   projectId: "findero-39098",
 
   // ✅ FIXED (VERY IMPORTANT)
-  storageBucket: "findero-39098.firebasestorage.app",
+  storageBucket: "findero-39098.appspot.com"
 
   messagingSenderId: "796711693094",
   appId: "1:796711693094:web:616efe1fd7291759d02fe7"
