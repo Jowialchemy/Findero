@@ -6,59 +6,12 @@
 <title>Report Lost Item</title>
 
 <style>
-body {
-  font-family: Arial, sans-serif;
-  background: #f5f5f5;
-  margin: 0;
-  padding: 20px;
-}
-
-.container {
-  max-width: 600px;
-  margin: auto;
-  background: #fff;
-  padding: 20px;
-  border-radius: 12px;
-}
-
-h2 {
-  text-align: center;
-}
-
-input, textarea {
-  width: 100%;
-  padding: 12px;
-  margin-bottom: 12px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-}
-
-textarea {
-  height: 100px;
-}
-
-button {
-  width: 100%;
-  padding: 14px;
-  background: #e74c3c;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-}
-
-#preview {
-  width: 100%;
-  border-radius: 8px;
-  margin-top: 10px;
-  display: none;
-}
-
-.msg {
-  text-align: center;
-  margin-top: 10px;
-  font-weight: bold;
-}
+body { font-family: Arial; background: #f5f5f5; padding: 20px; }
+.container { max-width: 600px; margin: auto; background: #fff; padding: 20px; border-radius: 12px; }
+input, textarea { width: 100%; padding: 12px; margin-bottom: 12px; border-radius: 8px; border: 1px solid #ccc; }
+button { width: 100%; padding: 14px; background: #e74c3c; color: white; border: none; border-radius: 8px; }
+#preview { width: 100%; display:none; margin-top:10px; border-radius:8px; }
+.msg { text-align:center; margin-top:10px; }
 </style>
 </head>
 
@@ -67,19 +20,16 @@ button {
 <div class="container">
   <h2>Report Lost Item</h2>
 
-  <input type="text" id="name" placeholder="Your Name">
-  <input type="text" id="item" placeholder="Item Lost (e.g Phone, Bag)">
-  <input type="text" id="location" placeholder="Where it was lost">
-  <input type="date" id="dateLost">
-  <textarea id="description" placeholder="Describe the item"></textarea>
-  <input type="text" id="contact" placeholder="Contact Info (Phone/WhatsApp)">
+  <input id="name" placeholder="Your Name">
+  <input id="item" placeholder="Item Lost">
+  <input id="location" placeholder="Where lost">
+  <textarea id="description"></textarea>
+  <input id="contact" placeholder="Contact">
+  <input type="file" id="imageFile">
 
-  <!-- IMAGE -->
-  <input type="file" id="imageFile" accept="image/*">
   <img id="preview">
 
-  <button id="submitBtn">Submit Report</button>
-
+  <button id="submitBtn">Submit</button>
   <div class="msg" id="msg"></div>
 </div>
 
@@ -93,7 +43,6 @@ const msg = document.getElementById("msg");
 const imageInput = document.getElementById("imageFile");
 const preview = document.getElementById("preview");
 
-/* ✅ IMAGE PREVIEW */
 imageInput.addEventListener("change", () => {
   const file = imageInput.files[0];
   if(file){
@@ -102,20 +51,18 @@ imageInput.addEventListener("change", () => {
   }
 });
 
-/* ✅ SUBMIT */
 btn.addEventListener("click", async () => {
 
   const name = document.getElementById("name").value.trim();
   const item = document.getElementById("item").value.trim();
   const location = document.getElementById("location").value.trim();
-  const dateLost = document.getElementById("dateLost").value;
   const description = document.getElementById("description").value.trim();
   const contact = document.getElementById("contact").value.trim();
   const file = imageInput.files[0];
 
   if(!name || !item || !location || !description || !contact){
+    msg.innerText = "Fill all fields";
     msg.style.color = "red";
-    msg.innerText = "Please fill all required fields";
     return;
   }
 
@@ -125,17 +72,17 @@ btn.addEventListener("click", async () => {
     let imageURL = "";
 
     if(file){
-      const storageRef = ref(storage, "lost-items/" + Date.now() + "_" + file.name);
+      const storageRef = ref(storage, "items/" + Date.now() + "_" + file.name);
       const uploadTask = uploadBytesResumable(storageRef, file);
 
       await new Promise((resolve, reject) => {
         uploadTask.on(
           "state_changed",
-          (snapshot) => {
-            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-            msg.innerText = "Uploading: " + Math.round(progress) + "%";
+          (snap) => {
+            const p = (snap.bytesTransferred / snap.totalBytes) * 100;
+            msg.innerText = "Uploading: " + Math.round(p) + "%";
           },
-          (error) => reject(error),
+          reject,
           async () => {
             imageURL = await getDownloadURL(uploadTask.snapshot.ref);
             resolve();
@@ -144,31 +91,28 @@ btn.addEventListener("click", async () => {
       });
     }
 
-    msg.innerText = "Saving...";
-
-    await addDoc(collection(db, "lostItems"), {
+    await addDoc(collection(db,"items"),{
+      type: "lost",
       name,
       item,
       location,
-      dateLost,
       description,
       contact,
-      imageURL,
-      status: "pending",
+      imageUrl: imageURL, // ✅ FIXED
+      status:"pending",
       createdAt: Date.now()
     });
 
+    msg.innerText = "✅ Submitted!";
     msg.style.color = "green";
-    msg.innerText = "✅ Lost item reported successfully!";
 
-    // RESET
     document.querySelectorAll("input, textarea").forEach(el => el.value = "");
     preview.style.display = "none";
 
-  } catch (error) {
-    console.error(error);
+  } catch(err){
+    console.error(err);
+    msg.innerText = err.message;
     msg.style.color = "red";
-    msg.innerText = error.message;
   }
 
 });
