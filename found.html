@@ -6,53 +6,12 @@
 <title>Report Found Item</title>
 
 <style>
-body {
-  font-family: Arial;
-  padding: 20px;
-  background: #f5f5f5;
-}
-
-.container {
-  max-width: 600px;
-  margin: auto;
-  background: #fff;
-  padding: 20px;
-  border-radius: 10px;
-}
-
-h2 {
-  text-align: center;
-}
-
-input, textarea {
-  width: 100%;
-  padding: 12px;
-  margin: 10px 0;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-}
-
-button {
-  width: 100%;
-  padding: 14px;
-  background: orange;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-#preview {
-  width: 100%;
-  margin-top: 10px;
-  border-radius: 8px;
-  display: none;
-}
-
-#status {
-  text-align: center;
-  margin-top: 10px;
-}
+body { font-family: Arial; padding: 20px; background: #f5f5f5; }
+.container { max-width: 600px; margin: auto; background: #fff; padding: 20px; border-radius: 10px; }
+input, textarea { width: 100%; padding: 12px; margin: 10px 0; border-radius: 6px; border: 1px solid #ccc; }
+button { width: 100%; padding: 14px; background: orange; color: white; border: none; border-radius: 6px; cursor: pointer; }
+#preview { width: 100%; margin-top: 10px; border-radius: 8px; display: none; }
+#status { text-align: center; margin-top: 10px; }
 </style>
 </head>
 
@@ -64,13 +23,12 @@ button {
   <input id="name" placeholder="Item name">
   <input id="location" placeholder="Where found">
   <textarea id="description" placeholder="Description"></textarea>
-  <input id="secret" placeholder="Secret detail (for verification)">
+  <input id="secret" placeholder="Secret detail">
   <input type="file" id="image">
 
   <img id="preview">
 
   <button id="submitBtn">Submit</button>
-
   <p id="status"></p>
 </div>
 
@@ -84,7 +42,7 @@ const status = document.getElementById("status");
 const imageInput = document.getElementById("image");
 const preview = document.getElementById("preview");
 
-/* PREVIEW */
+/* IMAGE PREVIEW */
 imageInput.addEventListener("change", () => {
   const file = imageInput.files[0];
   if(file){
@@ -115,18 +73,17 @@ btn.addEventListener("click", async () => {
     let imageURL = "";
 
     if(file){
-      const storageRef = ref(storage, "found-items/" + Date.now() + "_" + file.name);
-
+      const storageRef = ref(storage, "items/" + Date.now() + "_" + file.name);
       const uploadTask = uploadBytesResumable(storageRef, file);
 
       await new Promise((resolve, reject) => {
         uploadTask.on(
           "state_changed",
-          (snapshot) => {
-            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-            status.innerText = "Uploading: " + Math.round(progress) + "%";
+          (snap) => {
+            const p = (snap.bytesTransferred / snap.totalBytes) * 100;
+            status.innerText = "Uploading: " + Math.round(p) + "%";
           },
-          (error) => reject(error),
+          reject,
           async () => {
             imageURL = await getDownloadURL(uploadTask.snapshot.ref);
             resolve();
@@ -135,26 +92,21 @@ btn.addEventListener("click", async () => {
       });
     }
 
-    status.innerText = "Saving...";
-
-    await addDoc(collection(db,"foundItems"),{
+    await addDoc(collection(db,"items"),{
+      type: "found",
       name,
       location,
       description,
       secret,
-      imageURL,
+      imageUrl: imageURL, // ✅ FIXED
       status:"pending",
       createdAt: Date.now()
     });
 
-    status.innerText = "✅ Item submitted successfully!";
+    status.innerText = "✅ Submitted!";
     status.style.color = "green";
 
-    document.getElementById("name").value = "";
-    document.getElementById("location").value = "";
-    document.getElementById("description").value = "";
-    document.getElementById("secret").value = "";
-    imageInput.value = "";
+    document.querySelectorAll("input, textarea").forEach(el => el.value = "");
     preview.style.display = "none";
 
   } catch(err){
