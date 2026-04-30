@@ -8,10 +8,10 @@ import {
   deleteDoc
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-// Reference to table body
+// Target table
 const tableBody = document.getElementById("adminTable");
 
-// 🔥 LOAD ALL ITEMS AUTOMATICALLY
+// 🔥 LOAD ITEMS FROM FIRESTORE
 async function loadItems() {
   tableBody.innerHTML = "<tr><td colspan='6'>Loading...</td></tr>";
 
@@ -38,7 +38,7 @@ async function loadItems() {
           <td>
             ${
               data.imageUrl
-                ? `<img src="${data.imageUrl}" width="50" height="50" style="object-fit:cover;border-radius:5px;" />`
+                ? `<img src="${data.imageUrl}" width="50" height="50" style="border-radius:6px;" />`
                 : "No Image"
             }
           </td>
@@ -55,44 +55,50 @@ async function loadItems() {
 
       tableBody.innerHTML += row;
     });
+
   } catch (error) {
     console.error(error);
-    tableBody.innerHTML =
-      "<tr><td colspan='6'>Error loading items</td></tr>";
+    tableBody.innerHTML = "<tr><td colspan='6'>Error loading items</td></tr>";
   }
 }
 
-// ✅ VERIFY ITEM
+// ✅ VERIFY
 window.verifyItem = async function (id) {
   try {
-    const itemRef = doc(db, "items", id);
-
-    await updateDoc(itemRef, {
+    await updateDoc(doc(db, "items", id), {
       status: "verified"
     });
 
-    alert("Item verified!");
-    loadItems(); // refresh without reload
+    alert("Verified!");
+    loadItems();
+
   } catch (error) {
     console.error(error);
-    alert("Verification failed");
+    alert("Error verifying item");
   }
 };
 
-// ❌ DELETE ITEM
+// ❌ DELETE
 window.deleteItem = async function (id) {
-  const confirmDelete = confirm("Are you sure you want to delete this item?");
+  const confirmDelete = confirm("Delete this item?");
   if (!confirmDelete) return;
 
   try {
     await deleteDoc(doc(db, "items", id));
-    alert("Item deleted!");
+    alert("Deleted!");
     loadItems();
+
   } catch (error) {
     console.error(error);
-    alert("Delete failed");
+    alert("Error deleting item");
   }
 };
 
-// 🔁 INITIAL LOAD
+// 🔁 LOAD ON START
 loadItems();
+
+// 🔓 OPTIONAL LOGOUT
+window.logout = function () {
+  alert("Logged out");
+  window.location.href = "index.html";
+};
