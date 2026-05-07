@@ -149,9 +149,13 @@ btn.addEventListener("click", async () => {
     preview.style.display = "none";
 
   } catch(err){
-    console.error(err);
-    status.innerText = "Error: " + err.message;
-    status.style.color = "red";
+  console.error(err);
+
+  // SHOW REAL FIREBASE ERROR
+  alert(err.message);
+
+  status.innerText = "Error: " + err.message;
+  status.style.color = "red";
   }
 
   btn.disabled = false;
