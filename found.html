@@ -3,50 +3,210 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Found Test</title>
+<title>Report Found Item</title>
+
+<style>
+body {
+  font-family: Arial;
+  padding: 20px;
+  background: #111;
+  color: white;
+}
+
+.container {
+  max-width: 600px;
+  margin: auto;
+  background: #1c1c1c;
+  padding: 20px;
+  border-radius: 12px;
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+input,
+textarea {
+  width: 100%;
+  padding: 14px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  border: 1px solid #444;
+  background: #222;
+  color: white;
+  box-sizing: border-box;
+}
+
+textarea {
+  min-height: 100px;
+}
+
+button {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 8px;
+  background: #b34700;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.7;
+}
+
+#preview {
+  width: 100%;
+  margin-top: 10px;
+  border-radius: 8px;
+  display: none;
+}
+
+#status {
+  text-align: center;
+  margin-top: 15px;
+  font-weight: bold;
+}
+</style>
 </head>
 
 <body>
 
-<h2>Report Found Item</h2>
+<div class="container">
 
-<input id="name" placeholder="Item name">
-<button id="submitBtn">Submit</button>
+  <h2>Report Found Item</h2>
 
-<p id="status"></p>
+  <input type="text" id="name" placeholder="Item name">
+
+  <input type="text" id="location" placeholder="Where item was found">
+
+  <textarea id="description" placeholder="Describe the item"></textarea>
+
+  <input type="text" id="secret" placeholder="Secret detail for verification">
+
+  <input type="file" id="image" accept="image/*">
+
+  <img id="preview">
+
+  <button id="submitBtn">Submit</button>
+
+  <div id="status"></div>
+
+</div>
 
 <script type="module">
 
-import { db } from "./scripts/firebase.js";
+import { db, storage } from "./scripts/firebase.js";
 
 import {
   collection,
   addDoc
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
+import {
+  ref,
+  uploadBytes,
+  getDownloadURL
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+
 const btn = document.getElementById("submitBtn");
 const status = document.getElementById("status");
+const imageInput = document.getElementById("image");
+const preview = document.getElementById("preview");
 
+/* IMAGE PREVIEW */
+imageInput.addEventListener("change", () => {
+
+  const file = imageInput.files[0];
+
+  if(file){
+    preview.src = URL.createObjectURL(file);
+    preview.style.display = "block";
+  }
+
+});
+
+/* SUBMIT */
 btn.addEventListener("click", async () => {
 
-  status.innerText = "Button clicked";
+  const name = document.getElementById("name").value.trim();
+  const location = document.getElementById("location").value.trim();
+  const description = document.getElementById("description").value.trim();
+  const secret = document.getElementById("secret").value.trim();
+
+  const file = imageInput.files[0];
+
+  /* VALIDATION */
+  if(!name || !location || !description || !secret){
+
+    status.innerText = "Please fill all fields";
+    status.style.color = "red";
+    return;
+  }
+
+  if(!file){
+
+    status.innerText = "Please select an image";
+    status.style.color = "red";
+    return;
+  }
+
+  btn.disabled = true;
 
   try {
 
+    status.innerText = "Uploading image...";
+
+    /* UPLOAD IMAGE */
+    const storageRef = ref(
+      storage,
+      "items/" + Date.now() + "_" + file.name
+    );
+
+    await uploadBytes(storageRef, file);
+
+    const imageUrl = await getDownloadURL(storageRef);
+
+    status.innerText = "Saving item...";
+
+    /* SAVE TO FIRESTORE */
     await addDoc(collection(db, "items"), {
-      test: "working"
+
+      type: "found",
+      name,
+      location,
+      description,
+      secret,
+      imageUrl,
+      status: "pending",
+      createdAt: Date.now()
+
     });
 
-    status.innerText = "SUCCESS";
+    status.innerText = "✅ Item submitted successfully!";
+    status.style.color = "lime";
 
-  } catch(err) {
+    /* RESET FORM */
+    document.querySelectorAll("input, textarea").forEach(el => {
+      el.value = "";
+    });
+
+    preview.style.display = "none";
+
+  } catch(err){
 
     console.error(err);
 
     status.innerText = err.message;
+    status.style.color = "red";
 
     alert(err.message);
+
   }
+
+  btn.disabled = false;
 
 });
 
