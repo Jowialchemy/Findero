@@ -3,163 +3,53 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Report Found Item</title>
-
-<style>
-body {
-  font-family: Arial;
-  padding: 20px;
-  background: #f5f5f5;
-}
-
-.container {
-  max-width: 600px;
-  margin: auto;
-  background: #fff;
-  padding: 20px;
-  border-radius: 10px;
-}
-
-h2 {
-  text-align: center;
-}
-
-input, textarea {
-  width: 100%;
-  padding: 12px;
-  margin: 10px 0;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-}
-
-button {
-  width: 100%;
-  padding: 14px;
-  background: orange;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-#preview {
-  width: 100%;
-  margin-top: 10px;
-  border-radius: 8px;
-  display: none;
-}
-
-#status {
-  text-align: center;
-  margin-top: 10px;
-  font-weight: bold;
-}
-</style>
+<title>Found Test</title>
 </head>
 
 <body>
 
-<div class="container">
-  <h2>Report Found Item</h2>
+<h2>Report Found Item</h2>
 
-  <input id="name" placeholder="Item name">
-  <input id="location" placeholder="Where found">
-  <textarea id="description" placeholder="Description"></textarea>
-  <input id="secret" placeholder="Secret detail">
-  <input type="file" id="image" accept="image/*">
+<input id="name" placeholder="Item name">
+<button id="submitBtn">Submit</button>
 
-  <img id="preview">
-
-  <button id="submitBtn">Submit</button>
-
-  <p id="status"></p>
-</div>
+<p id="status"></p>
 
 <script type="module">
-import { db, storage } from "./firebase.js";
-import { collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+
+import { db } from "./scripts/firebase.js";
+
+import {
+  collection,
+  addDoc
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const btn = document.getElementById("submitBtn");
 const status = document.getElementById("status");
-const imageInput = document.getElementById("image");
-const preview = document.getElementById("preview");
 
-/* IMAGE PREVIEW */
-imageInput.addEventListener("change", () => {
-  const file = imageInput.files[0];
-  if(file){
-    preview.src = URL.createObjectURL(file);
-    preview.style.display = "block";
-  }
-});
-
-/* SUBMIT */
 btn.addEventListener("click", async () => {
 
-  const name = document.getElementById("name").value.trim();
-  const location = document.getElementById("location").value.trim();
-  const description = document.getElementById("description").value.trim();
-  const secret = document.getElementById("secret").value.trim();
-  const file = imageInput.files[0];
-
-  // VALIDATION
-  if(!name || !location){
-    status.innerText = "Please fill required fields";
-    status.style.color = "red";
-    return;
-  }
-
-  // 🔥 FORCE IMAGE
-  if(!file){
-    status.innerText = "Image is required";
-    status.style.color = "red";
-    return;
-  }
-
-  btn.disabled = true;
-  status.innerText = "Uploading image...";
+  status.innerText = "Button clicked";
 
   try {
-    // UPLOAD IMAGE
-    const storageRef = ref(storage, "items/" + Date.now() + "_" + file.name);
-    await uploadBytes(storageRef, file);
 
-    const imageUrl = await getDownloadURL(storageRef);
-
-    status.innerText = "Saving item...";
-
-    // SAVE TO FIRESTORE
-    await addDoc(collection(db,"items"),{
-      type: "found",
-      name,
-      location,
-      description,
-      secret,
-      imageUrl,
-      status:"pending",
-      createdAt: Date.now()
+    await addDoc(collection(db, "items"), {
+      test: "working"
     });
 
-    status.innerText = "✅ Item submitted successfully!";
-    status.style.color = "green";
+    status.innerText = "SUCCESS";
 
-    // RESET FORM
-    document.querySelectorAll("input, textarea").forEach(el => el.value = "");
-    preview.style.display = "none";
+  } catch(err) {
 
-  } catch(err){
-  console.error(err);
+    console.error(err);
 
-  // SHOW REAL FIREBASE ERROR
-  alert(err.message);
+    status.innerText = err.message;
 
-  status.innerText = "Error: " + err.message;
-  status.style.color = "red";
+    alert(err.message);
   }
 
-  btn.disabled = false;
 });
+
 </script>
 
 </body>
